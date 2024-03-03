@@ -21,8 +21,8 @@ Follow these steps to get your development environment set up:
 
 1. **Clone the repository**
     ```
-    git clone https://github.com/<yourusername>/budget-tracker.git
-    cd budget-tracker
+    git clone https://github.com/<yourusername>/budget-tracker-app.git
+    cd budget-tracker-app
     ```
 
 2. **Install dependencies**
@@ -60,7 +60,7 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 ## Project Structure
 Here is a basic overview of our project's structure:
 
-budget-tracker/
+budget-tracker-app/
 
 ├── client/ # React frontend application
 
