@@ -40,7 +40,11 @@ Follow these steps to get your development environment set up:
         ```
 
 4. **Set Up Environment Variables**
-   - Create a `.env` file in the server directory based on the `.env.example` template. Fill in your MongoDB URI and any other necessary configurations.
+   - Create a `.env` file in the server directory based on the `.env.example` template. Fill in your MongoDB URI and any other necessary configurations. Example content for your `.env` file:
+     ```
+     MONGODB_URI=mongodb+srv://pmuniz159:la7vk0hDq20VxF0z@budgettrackerdevelopmen.8qvwdbr.mongodb.net/?retryWrites=true&w=majority&appName=BudgetTrackerDevelopment
+     PORT=3000
+     ```
 
 5. **Run the Application**
    - Start the backend server from the server directory:
@@ -49,6 +53,7 @@ Follow these steps to get your development environment set up:
         ```
    - In a new terminal, navigate to the client directory and start the frontend application:
         ```
+        cd client
         npm start
         ```
     The application should now be running on `localhost:3000` for the frontend. Ensure the backend server is also running as it serves the API requests from the frontend.
@@ -62,9 +67,12 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 Here is a basic overview of our project's structure:
 
 budget-tracker-app/
+
 ├── client/ # React frontend application
+
 ├── server/ # Node.js + Express backend API
- └── models/ # MongoDB models
+
+    └── models/ # MongoDB models
 
 
 ## License
