@@ -1,4 +1,4 @@
-# budget-tracker
+# Budget Tracker
 
 ## Description
 Budget Tracker is a web application designed to help people manage their finances more effectively. By providing tools to budget and save money, Budget Tracker enables users to keep a close eye on their income and expenses. This visibility into financial habits empowers users to make informed decisions, see where their money is going, and identify opportunities to save.
@@ -21,36 +21,37 @@ Follow these steps to get your development environment set up:
 
 1. **Clone the repository**
     ```
-    git clone https://github.com/<yourusername>/budget-tracker-app.git
+    git clone https://github.com/munizp1/budget-tracker-app.git
     cd budget-tracker-app
     ```
 
-2. **Install dependencies**
+2. **Install Backend Dependencies**
    - Navigate to the backend directory and install dependencies:
         ```
         cd server
         npm install
         ```
-   - Navigate to the frontend directory in a new terminal window and install dependencies:
+
+3. **Install Frontend Dependencies**
+   - In a new terminal window, navigate to the frontend directory and install dependencies:
         ```
-        cd ../client
+        cd client
         npm install
         ```
 
-3. **Set up environment variables**
+4. **Set Up Environment Variables**
    - Create a `.env` file in the server directory based on the `.env.example` template. Fill in your MongoDB URI and any other necessary configurations.
 
-4. **Run the application**
-   - Start the backend server:
+5. **Run the Application**
+   - Start the backend server from the server directory:
         ```
         npm start
         ```
-   - In a new terminal, start the frontend application:
+   - In a new terminal, navigate to the client directory and start the frontend application:
         ```
-        cd client
         npm start
         ```
-    The application should now be running on `localhost:3000`.
+    The application should now be running on `localhost:3000` for the frontend. Ensure the backend server is also running as it serves the API requests from the frontend.
 
 ## Contribution Guidelines
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -61,12 +62,9 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 Here is a basic overview of our project's structure:
 
 budget-tracker-app/
-
 ├── client/ # React frontend application
-
 ├── server/ # Node.js + Express backend API
-
-└── models/ # MongoDB models
+ └── models/ # MongoDB models
 
 
 ## License
@@ -76,4 +74,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Hat tip to anyone whose code was used
 - Inspiration
 - etc
-
