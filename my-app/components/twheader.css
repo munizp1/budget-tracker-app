@@ -1,0 +1,40 @@
+.tw-header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    width: 100%; /* Set width to 100% to fill the screen */
+  }
+  
+  .tw-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px; /* Add padding to the navbar */
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+  
+  .tw-brand h1 {
+    margin: 0;
+  }
+  
+  .tw-nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .tw-nav-links li {
+    display: inline;
+    margin-left: 20px;
+  }
+  
+  .tw-nav-links li:first-child {
+    margin-left: 0;
+  }
+  
+  .tw-nav-links li a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  
