@@ -5,14 +5,16 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 
-export default function Login({
+
+export default function SignUp({
   searchParams,
 }: {
   searchParams: { message: string };
 }) {
+ 
   const signIn = async (formData: FormData) => {
     "use server";
-
+    
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const supabase = createClient();
@@ -23,7 +25,7 @@ export default function Login({
     });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user");
+      return redirect("/signup?message=Could not authenticate user");
     }
 
     return redirect("/protected");
@@ -31,15 +33,17 @@ export default function Login({
 
   const signUp = async (formData: FormData) => {
     "use server";
-
+    //const session = useSession();
     const origin = headers().get("origin");
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const supabase = createClient();
     const fname = formData.get("fname") as string;
     const lname = formData.get("lname") as string;
-    const supabase = createClient();
+   
+    
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error:signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -47,15 +51,33 @@ export default function Login({
       },
     });
 
-    if (error) {
-      return redirect("/login?message=Could not authenticate user");
+    if (signUpError) {
+      return redirect("/signup?message=Could not authenticate user");
     }
+    const user = data.user;
+    console.log("Signup Data:", user);
+    
+    const { data:profiles,error:profileError } = await supabase
+    .from('profile')
+    .insert([
+    { id: user.id, first_name: fname, last_name: lname },
+  ])
+  console.log(profiles)
+  console.log("Session ID:", user.id)
+  if (profileError) {
+    console.log(profileError);
+    return redirect("/signup?message=Error creating user profile");
+    
+  }
+  console.log(profileError)
+    return redirect("/signup?message=Check email to continue sign in process");
 
-    return redirect("/login?message=Check email to continue sign in process");
+
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
+    <div className="w-full min-h-screen flex flex-col items-center">
+    <div className=" flex-1 flex flex-col w-full px-8 sm:max-w-xl justify-center gap-2 ">
       <Link
         href="/notes"
         className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
@@ -77,64 +99,105 @@ export default function Login({
         Back
       </Link>
 
-      <form className="animate-in flex-1 flex flex-col w-full  gap-2 text-foreground">
-      <label className="text-md" htmlFor="email">
-          First Name
-        </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
-          name="fname"
-          placeholder="you@example.com"
-          required
-        />
-        <label className="text-md" htmlFor="email">
-          Last Name
-        </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
-          name="lname"
-          placeholder="you@example.com"
-          required
-        />
-        <label className="text-md" htmlFor="email">
-          Email
-        </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
-          name="email"
-          placeholder="you@example.com"
-          required
-        />
-        <label className="text-md" htmlFor="password">
-          Password
-        </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
-          type="password"
-          name="password"
-          placeholder="••••••••"
-          required
-        />
-        <SubmitButton
-          formAction={signIn}
-          className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
-          pendingText="Signing In..."
-        >
-          Sign In
-        </SubmitButton>
-        <SubmitButton
-          formAction={signUp}
-          className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
-          pendingText="Signing Up..."
-        >
-          Sign Up
-        </SubmitButton>
-        {searchParams?.message && (
-          <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
-            {searchParams.message}
-          </p>
-        )}
-      </form>
+
+      
+      <form className=" animate-in flex-1 flex flex-col w-full  gap-2 text-foreground" style={{ marginTop: '50%' }}>
+  <div className="flex gap-14">
+    <div className="flex-1">
+      <label className="text-md" htmlFor="fname">
+        First Name
+      </label>
+      <input
+        className="rounded-md flex-1 px-4 py-2 bg-inherit border mb-6"
+        name="fname"
+        placeholder=" "
+        required
+      />
     </div>
+    <div className="flex-1">
+      <label className="text-md" htmlFor="lname">
+        Last Name
+      </label>
+      <input
+        className="rounded-md flex-1 px-4 py-2 bg-inherit border mb-6"
+        name="lname"
+        placeholder=" "
+        required
+      />
+    </div>
+  </div>
+  
+  <label className="text-md" htmlFor="email">
+    Email
+  </label>
+  <input
+    className="rounded-md px-4 py-2 bg-inherit border mb-6"
+    name="email"
+    placeholder="you@example.com"
+    required
+  />
+  <label className="text-md" htmlFor="password">
+    Password
+  </label>
+  <input
+    className="rounded-md px-4 py-2 bg-inherit border mb-6"
+    type="password"
+    name="password"
+    placeholder="••••••••"
+    required
+  />
+  <SubmitButton
+    formAction={signIn}
+    className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
+    pendingText="Signing In..."
+  >
+    Sign In
+  </SubmitButton>
+  <SubmitButton
+    formAction={signUp}
+    className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
+    pendingText="Signing Up..."
+  >
+    Sign Up
+  </SubmitButton>
+  {searchParams?.message && (
+    <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
+      {searchParams.message}
+    </p>
+  )}
+</form>
+</div>
+</div>   
+    
   );
+  
 }
+
+    
+    /*const { error:signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback`,
+      },
+    });
+
+    if (signUpError) {
+      return redirect("/signup?message=Could not authenticate user");
+    }
+    const { data, error:profileError } = await supabase
+    .from('profiles')
+    .insert([
+    { fistname: fname, lastname: lname },
+  ])
+  .select()
+  if (profileError) {
+    return redirect("/signup?message=Error creating user profile");
+  }
+
+    return redirect("/signup?message=Check email to continue sign in process");
+
+
+  };*/
+
+  
