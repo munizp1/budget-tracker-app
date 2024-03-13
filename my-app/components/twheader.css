@@ -1,18 +1,18 @@
-.tw-header {
+/*.tw-header {
     background-color: #333;
     color: #fff;
     padding: 20px 0;
-    width: 100%; /* Set width to 100% to fill the screen */
+    width: 100%; 
   }
-  
   .tw-navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px; /* Add padding to the navbar */
-    box-sizing: border-box; /* Include padding in width calculation */
+    padding: 0 20px; 
+    box-sizing: border-box; 
   }
   
+
   .tw-brand h1 {
     margin: 0;
   }
@@ -37,4 +37,4 @@
     text-decoration: none;
   }
   
-  
+  */
