@@ -9,6 +9,9 @@ export default function Login({
 }: {
   searchParams: { message: string };
 }) {
+  
+
+
   const signIn = async (formData: FormData) => {
     "use server";
 
@@ -16,15 +19,16 @@ export default function Login({
     const password = formData.get("password") as string;
     const supabase = createClient();
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data ,error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-
+    const user = data.user;
+    console.log("User object:", user);
     if (error) {
       return redirect("/login?message=Could not authenticate user");
     }
-
+    console.log("Session ID:", user.id);
     return redirect("/protected");
   };
 
@@ -51,7 +55,18 @@ export default function Login({
     return redirect("/login?message=Check email to continue sign in process");
   };
 
+  const logSessionId = () => {
+    const supabase = createClient();
+    const session = supabase.auth.session();
+    if (session) {
+      console.log("Session ID:", session.user?.id);
+    } else {
+      console.log("No active session.");
+    }
+  };
+
   return (
+    <div className="w-full min-h-screen flex flex-col items-center">
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
       <Link
         href="/notes"
@@ -74,7 +89,7 @@ export default function Login({
         Back
       </Link>
 
-      <form className="animate-in flex-1 flex flex-col w-full  gap-2 text-foreground">
+      <form className="animate-in flex-1 flex flex-col w-full  gap-2 text-foreground" style={{ marginTop: '50%' }}>
         <label className="text-md" htmlFor="email">
           Email
         </label>
@@ -114,6 +129,7 @@ export default function Login({
           </p>
         )}
       </form>
+    </div>
     </div>
   );
 }
