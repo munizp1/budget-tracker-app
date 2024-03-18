@@ -1,9 +1,9 @@
 "use client"
 
-import { createClient } from '@/utils/supabase/server';
-import Layout from "../../components/layout"
+//import { createClient } from '@/utils/supabase/server';
+//import Layout from "../../components/layout"
 import React, { useState } from 'react';
-
+import { createClient } from "@/utils/supabase/client";
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
