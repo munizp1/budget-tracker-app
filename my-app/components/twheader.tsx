@@ -25,7 +25,7 @@ export default function TWHeader() {
         <div className="tw-brand">
           <h1>Budget Tracker</h1>
         </div>
-          <li><a href="#">Home</a></li>
+          <li><a href="/protected">Home</a></li>
           <li><a href="#">About</a></li>
           <li><a href="#">Services</a></li>
           <li><a href="#">Contact</a></li>
