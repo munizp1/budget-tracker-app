@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/twheader.jsx", "components/twfooter.jsx", "app/notes/page.jsx", "components/twfooter.jsx", "app/Example/page.jsx", "app/protected/page.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/twheader.jsx", "components/twfooter.jsx", "app/notes/page.jsx", "components/twfooter.jsx", "app/Example/page.jsx", "app/protected/page.jsx", "components/category/Categorypage.jsx"],
   "exclude": ["node_modules"]
 }
