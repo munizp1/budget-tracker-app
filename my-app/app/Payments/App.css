@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+:root{
+  --color-purple:#4a235a;
+  --color-blue:#0b91a5;
+}
+
+*>*{
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  text-align: center;
+  padding: 30px;
+}
+
+.Transactions {
+  text-align: center;
+  word-spacing: 20px;
+  padding: 5px; 
+}
+
+.bg-purple{
+  background-color:var(--color-purple);
+}
+
+.bg-blue{
+  background-color:var(--color-blue);
+}
+
+button {
+  word-spacing: 15px;
+}
