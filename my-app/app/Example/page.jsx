@@ -2,11 +2,7 @@
 import { useState } from 'react'
 import { StarIcon } from '@heroicons/react/20/solid'
 import { RadioGroup } from '@headlessui/react'
-import {Model} from "../../components/modeldata.js"
-import { Canvas,useLoader } from "@react-three/fiber";
-import {Suspense} from 'react'
-import * as THREE from "three";
-import {OrbitControls} from '@react-three/drei'
+
 
 
   
@@ -140,44 +136,7 @@ export default function Productoverview() {
             />
           </div>
         </div>
-        <div className="py-20 lg:col-span-32 lg:col-start-1 lg:border-r lg:border-gray-800 lg:pt-6 lg:pb-16 lg:pr-8">
-            {/* Description and details */}
-            <div className="card">
-            <div className="product-canvas-intro">
-                   <Canvas>
-                      <Suspense fallback={null}>
-                          <ambientLight/>
-                          <ambientLight/>
-                          <pointLight position={[10, 10, 10]} />
-                          <pointLight position={[10, 10, 10]} />
-                          <pointLight position={[10, 10, 10]} />
-                          <pointLight position={[10, 10, 10]} />
-                          <pointLight position={[10, 10, 10]} />
-                          <pointLight position={[10, 10, 10]} />
-                          <pointLight position={[10, 10, 10]} />
-
-                          
-
-                          
-                          <spotLight intensity={0.9} 
-                                     angle={0.1} 
-                                     penumbra={1} 
-                                     position={[10,15,10]}
-                                     //castShadow  
-                                     />
-                          <directionalLight position={[0, 2, 0]}/>  
-                          <directionalLight position={[0, -2, 0]}/>          
-                          <Model/>
-                          <OrbitControls enablePan={true}
-                                         enableZoom={true}
-                                         enableRotate={true}/>
-                      </Suspense>
-                      
-                   </Canvas>
-                </div>    
-                </div> 
-            
-          </div>
+        
 
         {/* Product info */}
         <div className="mx-auto max-w-2xl px-4 pt-10 pb-16 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pt-16 lg:pb-24">

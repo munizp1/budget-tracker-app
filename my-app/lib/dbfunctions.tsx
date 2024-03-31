@@ -32,6 +32,65 @@ export async function getProfile_id(supabase, user) {
     }
 }
 
+export async function getProfile_Income(supabase, user) {
+   console.log("For Income USER?",user);
+    try {
+        const { data:profile, error } = await supabase
+        
+            .from("profile")
+            .select("income")
+            .eq("id", user);
+            
+            
+
+        if (error) {
+            console.log("ERROR for INCOME")
+            throw error;
+        }
+       
+
+        if (profile && profile.length > 0) {
+            
+            
+            
+            return profile;
+        } else {
+            console.log("No profile data found for user ID:", user.id);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
+
+
+export async function getCustomCategory(supabase, user) {
+
+    console.log("For CustomCategory USER?", user);
+     try {
+         const { data:Categories, error } = await supabase
+         
+             .from("Categories")
+             .select("name")
+             .eq("profileId_Category", user[0].profile_id);
+             
+             
+ 
+         if (error) {
+             console.log("ERROR for INCOME")
+             throw error;
+         }
+        
+ 
+         return Categories
+
+     } catch (error) {
+         console.error('Error getting profile:', error.message);
+         throw error;
+     }
+ }
+
 
 
 export async function AddIncome(supabase, user, income) {
@@ -58,15 +117,42 @@ export async function AddIncome(supabase, user, income) {
     }
 }
 
-export async function AddPayment(supabase, user, category, time, price) {
+export async function AddCustomCategory(supabase, user, category) {
+   
+    try {
+        const { data:categorytable, error } = await supabase
+        
+            .from('Categories')
+            .insert([
+            { name: category, profileId_Category: user[0].profile_id},
+            ])
+            .select()
+            
+            
+
+        if (error) {
+            console.log("ERRORRRRRRRR")
+            throw error;
+        }
+       
+
+        
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
+
+export async function AddPayment(supabase, user, category, time, price, start, end) {
     
     
     console.log("USERID",user[0].profile_id);
     try {
+        const isoStart = start.toISOString().slice(0, 10);
         const { data:payment, error } = await supabase
             .from('payment')
             .insert([
-            { category: category, time: time, price: price, profile_id_user: user[0].profile_id},
+            { end_at: end, started_at: start, category: category, time: time, price: price, profile_id_user: user[0].profile_id},
             ])
             .select()
             
@@ -85,6 +171,9 @@ export async function AddPayment(supabase, user, category, time, price) {
         throw error;
     }
 }
+
+
+
 
 
 
@@ -117,6 +206,7 @@ export async function getPaymentData(supabase, user) {
 }
 
 
+
 export async function deleteCategory (supabase, categoryId) {
    
     console.log("CATEGORY IDDD", categoryId)
@@ -127,13 +217,13 @@ export async function deleteCategory (supabase, categoryId) {
             .delete()
             .eq("id", categoryId) 
             
-            
-
+        
+        
         if (error) {
             console.log("ERRORRRRRRRR")
             throw error;
         }
-      
+        
        
 
         
@@ -142,4 +232,6 @@ export async function deleteCategory (supabase, categoryId) {
         throw error;
     }
 }
+
+
 

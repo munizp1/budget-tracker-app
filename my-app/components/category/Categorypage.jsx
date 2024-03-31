@@ -7,10 +7,11 @@ import { Canvas,useLoader } from "@react-three/fiber";
 import {Suspense} from 'react'
 import * as THREE from "three";
 import {OrbitControls} from '@react-three/drei'
-import {deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
+import {updateStartedOn,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
 import { createClient } from "@/utils/supabase/client";
 import { useSessionContext } from '@supabase/auth-helpers-react';
-
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
 
 const categories = [
   { id: 1, name: 'Food', unavailable: false },
@@ -21,11 +22,13 @@ const categories = [
 ]
 
 const times = [
-  { id: 1, name: 'Daily', unavailable: false },
-  { id: 2, name: 'Weekly', unavailable: false },
-  { id: 3, name: 'Every 2 Weeks', unavailable: false },
-  { id: 4, name: 'Monthly', unavailable: false },
-  { id: 5, name: 'Yearly', unavailable: false },
+  { id: 1, name: 'Does Not Repeat', unavailable: false },
+  { id: 2, name: 'Daily', unavailable: false },
+  { id: 3, name: 'Weekly on ', unavailable: false },
+  { id: 4, name: 'Monthly on the fourth ', unavailable: false },
+  { id: 5, name: 'Annually on ', unavailable: false },
+  { id: 6, name: 'Every weekday (Monday to Friday)', unavailable: false },
+  
 ]
 
 
@@ -93,14 +96,45 @@ export default function Categorypage() {
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
   const [customer_id, setCustomer_id] = useState(null);
   const [user, setUser] = useState(null); 
-  const [income, setIncome] = useState('');
+  const [inputincome, setinputIncome] = useState();
+  const [income, setIncome] = useState(" ");
   const supabase = createClient();
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const [customCategory, setcustomCategory] = useState('');
   const [showCategoryInput, setShowCategoryInput] = useState(false); // State to manage the visibility of the category input field
   const [selectedCategory, setSelectedCategory] = useState(''); // State to store the selected category
   const [price, setnewprice] = useState('');
   const [selectedTime, setSelectedTime] = useState(null);
   const [addedCategories, setAddedCategories] = useState([]);
   const [paymentData, setPaymentData] = useState([]);
+
+  const [customCategories, setCustomCategories] = useState([]);
+
+
+  //FOR CALENDER 
+ 
+  const [startDate, setStartDate] = useState(null); // Define startDate state
+  const monthNames = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  
+ 
+
+  //FOR CUSTOM... 
+  const [showCustomDialog, setShowCustomDialog] = useState(false);
+  const [customRecurrence, setCustomRecurrence] = useState('');
+  const [repeatInterval, setRepeatInterval] = useState(1); // Define repeatInterval state
+  const [repeatUnit, setRepeatUnit] = useState('days');
+  const [endOption, setEndOption] = useState('Never'); // Define endOption state
+  const [endDate, setEndDate] = useState(''); // Define endDate state
+  const [occurrences, setOccurrences] = useState(0); // Define occurrences state
+
+
 
 
   useEffect(() => {
@@ -138,19 +172,63 @@ export default function Categorypage() {
   console.log("REALCustomer:", customer_id)
   console.log(user)
 
- 
+  useEffect(() => {
+    const fetchIncomeData = async () => {
+      try {
+        
+        const profileIncome = await getProfile_Income(supabase, user);
+        console.log("Profile Income:",profileIncome[0].income);
+        setIncome(profileIncome[0].income);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchIncomeData();
+  }, [user]);
+
+  console.log("INCOME",income)
+  console.log("CUSTOMER ID: ", customer_id);
 
   
+  useEffect(() => {
+    const fetchCustomCategories = async () => {
+      try {
+        // Fetch custom categories from the database
+        const x = await getCustomCategory(supabase, customer_id);
+        console.log("PEEK");
+        console.log("DB-FUNCTION CUSTOMCATEGORY: ", x);
+        setCustomCategories(x);
+      } catch (error) {
+        console.error('Error fetching custom categories:', error);
+      }
+    };
 
+    fetchCustomCategories();
+  }, [customer_id]);
+
+  console.log("Custom Categories: ", customCategories )
+  const combinedCategories = [...categories, ...customCategories];
+  console.log("Combined Categories: ", combinedCategories )
   const handleIncomeChange = (e) => {
-    setIncome(e.target.value);
+    setinputIncome(e.target.value);
   };
   const handleSubmitIncome = async (e) => {
     e.preventDefault();
     try {
         // Call the AddIncome function to update the income value in the user's profile
-        const updatedProfile = await AddIncome(supabase, customer_id, income);
+        const updatedProfile = await AddIncome(supabase, customer_id, inputincome);
         console.log('Profile updated with income:', updatedProfile);
+
+
+
+
+        const profileIncome = await getProfile_Income(supabase, user);
+    console.log("Profile Income:",profileIncome[0].income);
+    setIncome(profileIncome[0].income);
+
+    // Reset the input field
+    setinputIncome('');
     } catch (error) {
         console.error('Error updating income:', error);
     }
@@ -163,21 +241,80 @@ const handleCategorySelect = (category) => {
 const handleAddCategory = async () => {
   try {
   // Add your logic to handle adding the new category here
+  console.log('Adding new category...');
   console.log('Selected category:', selectedCategory);
-  
+  console.log('Selected Date', selectedDate);
   console.log('Selected Time:', selectedTime);
   console.log('Price:', price);
-  await AddPayment(supabase, customer_id, selectedCategory, selectedTime, price);
-    console.log('New category added successfully!');
+  console.log("END: ", endOption);
+  await AddPayment(supabase, customer_id, selectedCategory, selectedTime, price, startDate, endOption);
+  // Debug: Log the newCategory object
+  //console.log('New category:', newCategory);
 
+
+    
+  // Refetch payment categories after adding a new one
+  const updatedPaymentData = await getPaymentData(supabase, customer_id);
+  setPaymentData(updatedPaymentData);
+  console.log('New category added successfully.');
 
   // Reset the input fields and hide the category input section
     setSelectedCategory('');
     setSelectedTime('');
     setPrice('');
+    setStartDate('');
+    setEndOption('Never')
+
     setShowCategoryInput(false);
   } catch (error) {
     console.error('Error adding new category:', error.message);
+  }
+};
+
+useEffect(() => {
+  const fetchpaymentCategories = async () => {
+    try {
+      // Fetch custom categories from the database
+      const y = await getPaymentData(supabase, customer_id);
+      console.log("PEEK");
+      console.log("DB-FUNCTION PAYMENT DATA: ", y);
+      setPaymentData(y);
+    } catch (error) {
+      console.error('Error fetching custom categories:', error);
+    }
+  };
+
+  fetchpaymentCategories();
+}, [customer_id]);
+console.log("PAYEMENT DATAAAAAAAAAAAAAA")
+console.log(paymentData);
+
+
+
+const handleAddCustomCategory = async () => {
+  try {
+    console.log(customCategories.length);
+    if (customCategories.length >= 40) {
+      alert('Error: There cannot be more than 40 custom categories.');
+      return; // Exit the function if the maximum limit is reached
+    }
+  
+  console.log('Custom Category:', customCategory);
+  
+  
+  await AddCustomCategory(supabase, customer_id, customCategory);
+    console.log('New Custom category added successfully!');
+  
+    setCustomCategories([...customCategories, { id: customCategories.length + 1, name: customCategory }]);
+
+
+  // Reset the input fields and hide the category input section
+    setcustomCategory('');
+    setSelectedTime('');
+    setPrice('');
+    setShowCategoryInput(false);
+  } catch (error) {
+    console.error('Error adding new custom category:', error.message);
   }
 };
 
@@ -213,11 +350,94 @@ const handleDeleteCategory = async (categoryId) => {
   }
 };
 
+const handleDateChange = (date) => {
+  setStartDate(date);
+  if (date) {
+   
+    const selectedDayOfWeek = daysOfWeek[date.getDay()]; // Get the day name using the index
+    setSelectedDay(selectedDayOfWeek);
+    const monthnum = date.getMonth();
+    const day = date.getDate();
+    const selectedMonthName = monthNames[monthnum];
+    setSelectedMonth(selectedMonthName)
+
+   
+    const formattedDate = `${selectedMonthName} ${day}`;
+    setSelectedDate(formattedDate, () => {
+      // This callback function will be executed after setSelectedDate updates the state
+      console.log('Selected date:', selectedDate);
+    });
+
+
+
+    console.log('Selected day of the week:', selectedDayOfWeek);
+    const updatedTimes = times.map((time) => {
+      if (time.id === 3) {
+        return { ...time, name: `Weekly on ${selectedDayOfWeek}` };
+      }
+      if (time.id === 4) {
+        return { ...time, name: `Monthly on the fourth ${selectedDayOfWeek}` };
+      }
+      if (time.id === 5) {
+        return { ...time, name: `Annually on ${formattedDate}` };
+      }
+      return time;
+    });
+    console.log('Updated times:', updatedTimes);
+  }
+};
+
+const handleCustomDialog = () => {
+  setShowCustomDialog(!showCustomDialog);
+  console.log("AAAAAAAAAAAAAAA");
+  console.log('showCustomDialog:', showCustomDialog);
+};
+
+const handleCustomRecurrenceSubmit = () => {
+  // You can perform validation or additional logic here before submitting the custom recurrence
+  console.log('Custom Recurrence:', customRecurrence);
+  console.log("Every "+repeatInterval+" "+ repeatUnit);
+  console.log(endOption);
+  
+
+
+  let formattedEndOption = "";
+  if (endOption === "Never"){
+    formattedEndOption = "Never";
+  }
+  else if (endOption === "OnDate") {
+    let formattedEndDate = endDate.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    formattedEndOption = formattedEndDate;
+  } else if (endOption === "AfterOccurrences") {
+    formattedEndOption = "After "+ occurrences + " Occurrences";
+  }
+
+  setEndOption(formattedEndOption);
+  setSelectedTime("Every "+repeatInterval+" "+ repeatUnit);
+  // Close the pop-up after submission
+  setShowCustomDialog(false);
+};
+
+
   
 
   return (    
     <div className="bg-white">
     <div className="pt-6">
+      {/* SHOW CURRENT INCOME */}
+      <div className="flex justify-center mb-8">
+        <div className="bg-gray-200 p-4 rounded-md">
+          <p className="text-lg text-center font-semibold text-black">Current Income:</p>
+          <p className="text-xl text-center text-indigo-600">{income ? `$${income}` : 'Not available'}</p>
+        </div>
+      </div>
+
+
       {/* INCOME */}
       <div className="flex justify-center mb-8"> {/* Added margin-bottom for spacing */}
         <form onSubmit={handleSubmitIncome} className="max-w-md w-full">
@@ -227,10 +447,11 @@ const handleDeleteCategory = async (categoryId) => {
               type="text"
               id="income"
               name="income"
-              value={income}
+              value={inputincome}
               onChange={handleIncomeChange}
-              className="mt-1 px-4 py-2 w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-black"
+              className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
               placeholder="Enter your income"
+              
             />
           </div>
           <div className="text-center">
@@ -238,10 +459,67 @@ const handleDeleteCategory = async (categoryId) => {
           </div>
         </form>
       </div>
+      
+      {/* ADD Custom Category */}
+<div className="flex flex-col items-center">
+  {/* Button to toggle the visibility of the category input field */}
+  <button
+    type="button"
+    className="inline-flex justify-center items-center w-28 h-8 rounded-md border border-gray-300 shadow-sm bg-white text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    onClick={() => setShowNewCategoryInput(!showNewCategoryInput)}
+  >
+    {showNewCategoryInput ? 'Hide Categories' : 'Add Custom Category'}
+  </button>
+  {showNewCategoryInput && (
+    <div className="flex flex-col items-center mt-4">
+      {/* Input field to enter Custom Category */}
+      <input
+        type="text"
+        value={customCategory}
+        onChange={(e) => setcustomCategory(e.target.value)}
+        className="block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+        placeholder="Enter Custom Category"
+      />
+      {/* Button to add the custom category to database category or custom category */}
+      <button
+        type="button"
+        onClick={handleAddCustomCategory}
+        className="inline-flex justify-center mt-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        Add
+      </button>
+    </div>
+  )}
+  {/* Display list of custom categories */}
+{showNewCategoryInput && (
+  <div className="mt-4 w-1/2">
+    <h3 className="text-lg font-semibold mb-2 text-black">Custom Categories</h3>
+    <div className="flex flex-wrap -mx-2">
+      {customCategories.map((category, index) => {
+        return (
+          <div key={category.id} className="w-1/3 px-2 mb-4">
+            <div className="bg-gray-100 p-2 rounded-md flex justify-between items-center">
+              <span className="text-black">{category.name}</span>
+              <button
+                onClick={() => handleDeleteCustomCategory(category.id)}
+                className="text-red-600 hover:text-red-800 font-medium"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
+
+</div>
+
   
       {/* Category */}
       {/* Category Dropdown */}
-      <div className="flex items-center justify-center space-x-4">
+      <div className="flex items-center justify-center space-x-4 mt-6">
         {/* Button to toggle the visibility of the category input field */}
         <button
           type="button"
@@ -258,27 +536,59 @@ const handleDeleteCategory = async (categoryId) => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
             >
-              <option value="">Select a category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
+            <option value="">Select a category</option>
+              {combinedCategories
+              .sort((a, b) => a.name.localeCompare(b.name)) // Sort categories alphabetically by name
+              .map((category) => (
+            <option key={category.id} value={category.name}>
+            {category.name}
+            </option>
+            ))}
             </select>
+            {/* Date picker to select the starting day */}
+            <ReactDatePicker
+              selected={startDate} // Pass the selected date
+              onChange={handleDateChange} // Handle date change
+              className="block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+              placeholderText="Select starting day" // Placeholder text
+            />
   
             {/* Dropdown to select a Time from the predefined list */}
             <select
               value={selectedTime}
-              onChange={(e) => setSelectedTime(e.target.value)}
+              onChange={(e) => {
+                const selectedValue = e.target.value;
+                if (selectedValue === 'Custom...') {
+                  handleCustomDialog(); // Call the function to handle opening the custom dialog
+                } else {
+                  // Set selectedValue based on multiple conditions
+                  if (times.find(time => time.name === selectedValue)) {
+                    const selectedTimeObj = times.find(time => time.name === selectedValue);
+                    if (selectedTimeObj.id === 3 && selectedDay) {
+                      setSelectedTime(`Weekly on ${selectedDay}`);
+                    } else if (selectedTimeObj.id === 4 && selectedDay) {
+                      setSelectedTime(`Monthly on the fourth ${selectedDay}`);
+                    } else if (selectedTimeObj.id === 5 && selectedDate) {
+                      setSelectedTime(`Annually on ${selectedDate}`);
+                    } else {
+                      setSelectedTime(selectedValue);
+                    }
+                  }
+                }
+              }}
               className="block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
             >
               <option value="">Select a Time</option>
               {times.map((times) => (
                 <option key={times.id} value={times.name}>
-                  {times.name}
+                  {times.id === 3 && selectedDay ? `Weekly on ${selectedDay}` : times.id === 5 && selectedDate ? `Annually on ${selectedDate}`: times.id === 4 && selectedDay ? `Monthly on the fourth ${selectedDay}`: times.name}
+                  
                 </option>
               ))}
-            </select>
+              {/* Add a custom option that triggers the pop-up */}
+              <option value="Custom..." >Custom...</option>
+              </select>
+            
             {/* Input field to enter PRICE */}
             <input
               type="text"
@@ -298,11 +608,119 @@ const handleDeleteCategory = async (categoryId) => {
             </button>
           </div>
         )}
+        {/* Custom Dialog */}
+        {showCustomDialog && (
+        <div className="fixed inset-0 overflow-y-auto z-50 flex justify-center items-center">
+          <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+          <div className="relative bg-white p-4 rounded-lg">
+            <h3 className="text-lg text-black font-semibold mb-4">Custom Recurrence</h3>
+
+            {/* Repeat Interval Input */}
+            <div className="mb-4">
+              <label htmlFor="repeatInterval" className="block text-sm font-medium text-gray-700">Repeat Every</label>
+              <div className="text-black flex items-center">
+                <input
+                  type="number"
+                  id="repeatInterval"
+                  value={repeatInterval}
+                  onChange={(e) => setRepeatInterval(e.target.value)}
+                  className="mt-1 px-4 py-2 w-24 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm mr-2"
+                />
+                <span className="text-sm text-gray-700">Choose interval</span>
+              </div>
+            </div>
+
+            {/* Repeat Unit Dropdown */}
+            <div className="mb-4">
+              <label htmlFor="repeatUnit" className="block text-sm font-medium text-gray-700">Unit</label>
+              <select
+                id="repeatUnit"
+                value={repeatUnit}
+                onChange={(e) => setRepeatUnit(e.target.value)}
+                className="text-black mt-1 px-4 py-2 w-48 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+              >
+                <option value="days">Days</option>
+                <option value="weeks">Weeks</option>
+                <option value="months">Months</option>
+                <option value="years">Years</option>
+              </select>
+            </div>
+
+            {/* Day of Week Selection */}
+      {repeatUnit === "weeks" && (
+        <div className="mb-4 flex justify-center">
+          {daysOfWeek.map((day) => (
+            <button
+              key={day}
+              onClick={() => setSelectedDay(day)}
+              className={`mx-1 p-3 rounded-full focus:outline-none ${
+                selectedDay === day ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              {day.substring(0, 1)}
+            </button>
+          ))}
+        </div>
+      )}
+            {/* Ends Section */}
+      <div className="mb-4">
+        <label htmlFor="ends" className="block text-sm font-medium text-gray-700">Ends</label>
+        <select
+          id="ends"
+          value={endOption}
+          onChange={(e) => setEndOption(e.target.value)}
+          className="text-black mt-1 px-4 py-2 w-48 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+        >
+          <option value="Never">Never</option>
+          <option value="OnDate">On a specific date</option>
+          <option value="AfterOccurrences">After a number of occurrences</option>
+        </select>
+        {endOption === "OnDate" && (
+          <ReactDatePicker
+          selected={endDate} // Pass the selected date
+          onChange={(date) => setEndDate(date)} // Handle date change
+          className="text-black block mt-1 px-4 py-2 w-48 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+          placeholderText="Select end date" // Placeholder text
+        />
+        )}
+        {endOption === "AfterOccurrences" && (
+          <input
+            type="number"
+            value={occurrences}
+            onChange={(e) => setOccurrences(e.target.value)}
+            className="text-black mt-1 px-4 py-2 w-24 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm mr-2"
+          />
+        )}
+      </div>
+
+            {/* Submit and Cancel Buttons */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleCustomRecurrenceSubmit}
+                className="inline-flex justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2"
+              >
+                Submit
+              </button>
+              <button
+                onClick={handleCustomDialog}
+                className="inline-flex justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+  
+
+
       </div>
   
       {/* Table displaying added categories */}
       <div className="mt-10">
-        <h2 className="text-lg font-semibold mb-4 text-black">Added Categories</h2>
+        <h2 className="text-lg font-semibold mb-4 ml-6 text-black">Added Categories</h2>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -310,26 +728,48 @@ const handleDeleteCategory = async (categoryId) => {
                 Category
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Created on
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Started on
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Ends on
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Time
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Price
               </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 text-black">
+          
             {paymentData.map((item) => (
               <tr key={item.id}>
                 <td className="px-6 py-4 whitespace-nowrap">{item.category}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.created_at ? new Date(item.created_at).toLocaleString('en-US', {timeZone: 'EST'}) : ''}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.started_at}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.end_at}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{item.time}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.price}</td>
+                <td className="px-6 py-4 whitespace-nowrap">${item.price}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => handleDeleteCategory(item.id)} // Pass the item id to the delete handler
-                    className="text-red-600 hover:text-red-800 font-medium"
-                  >
-                    Delete
-                  </button>
+                <button
+                  onClick={() => handleEdit(item)} // Pass the item id to the edit handler
+                  className="text-indigo-600 hover:text-indigo-800 font-medium mr-2"
+                >
+                Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteCategory(item.id)} // Pass the item id to the delete handler
+                  className="text-red-600 hover:text-red-800 font-medium"
+                >
+                Delete
+                </button>
                 </td>
               </tr>
             ))}
