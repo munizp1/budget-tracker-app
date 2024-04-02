@@ -33,7 +33,7 @@ const Dashboard = () => {
             <footer className="footer">
                 <p>&copy; 2024 Budget Tracking App. All rights reserved.</p>
             </footer>
-            <link rel="stylesheet" href="https://classless.de/classless.css" />
+            
         </div>
     );
 }

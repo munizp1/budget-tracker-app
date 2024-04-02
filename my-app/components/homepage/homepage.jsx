@@ -10,7 +10,7 @@ import {OrbitControls, Text} from '@react-three/drei'
 import { getProfile_id } from '../../lib/dbfunctions'
 import { createClient } from "@/utils/supabase/client";
 
-
+import Dashboard from '@/components/dashboard/dashboard'
 
 
   
@@ -75,16 +75,8 @@ export default function Homepage() {
     
       
         {modelClicked ? (
-          <div className="h-screen bg-gray-900">
-            <div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3">
-            <li><a href="/addpayment4"> ADD PAYMENT BUTTON</a></li>
-        
-            </div>
-
-
-
-
-          </div> // Render a blank screen when modelClicked is true
+          <Dashboard/>
+           // Render a blank screen when modelClicked is true
         ) : (
           <div className="h-screen bg-gray-900">
           <Canvas camera={{ position: [0, 0, 2] }}>
