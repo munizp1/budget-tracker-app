@@ -29,7 +29,7 @@ export default function TWHeader() {
           <li><a href="/SavingsGoals">Saving Goals</a></li>
           <li><a href="/UpcomingPayments">Upcoming Payments</a></li>
           <li><a href="/ManageGoals">Manage Goals</a></li>
-          <li><a href="#">About</a></li>
+          <li><a href="/About">About</a></li>
           <li><a href="/contact">Contact</a></li>
           {isSupabaseConnected && <SignUpButton />}
           {isSupabaseConnected && <AuthButton />}
