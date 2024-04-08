@@ -1,6 +1,6 @@
 'use client';
 import { useState,useEffect } from 'react'
-import {getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
+import {deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
 import { createClient } from "@/utils/supabase/client";
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
@@ -22,13 +22,6 @@ const times = [
   { id: 6, name: 'Every weekday (Monday to Friday)', unavailable: false },
   
 ]
-
-
-
-
-
-
-
 
 export default function Categorypage() {
   
@@ -72,8 +65,27 @@ export default function Categorypage() {
   const [endDate, setEndDate] = useState(''); // Define endDate state
   const [occurrences, setOccurrences] = useState(0); // Define occurrences state
 
+  //FOR EDIT OPTION
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editItemData, setEditItemData] = useState(null);
+  const [editprice, setEditPrice]=useState(null);
+  const [editcategory, setEditCategory]=useState(null);
+  const [edittime, setEditTime]=useState(null);
+  const [editstart, setEditStart]=useState(null);
+  const [editend, setEditEnd]=useState(null);
+
+  const [estartDate, seteStartDate] = useState(null); // Define startDate state
+  const emonthNames = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  const edaysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const [eselectedDay, seteSelectedDay] = useState(null);
+  const [eselectedMonth, seteSelectedMonth] = useState(null);
+  const [eselectedDate, seteSelectedDate] = useState(null);
 
 
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -107,8 +119,7 @@ export default function Categorypage() {
   }, [user]);
 
 
-  console.log("REALCustomer:", customer_id)
-  console.log(user)
+
 
   useEffect(() => {
     const fetchIncomeData = async () => {
@@ -275,7 +286,7 @@ console.log("USER PAYEMENT DATA",paymentData)
   
 const handleDeleteCategory = async (categoryId) => {
   try {
-    console.log("categoryId", categoryId);
+    console.log("categoryIdEEEEEEEEE", categoryId);
     // Call the function to delete the category from the database
     await deleteCategory(supabase,categoryId);
     
@@ -285,6 +296,65 @@ const handleDeleteCategory = async (categoryId) => {
     console.log('Category deleted successfully!');
   } catch (error) {
     console.error('Error deleting category:', error.message);
+  }
+};
+
+
+const handleDeleteCustomCategory = async (customcategoryId) => {
+  try {
+    console.log("categoryId FOR HANDLE DELTE CUSTOM CATEGORY: ", customcategoryId);
+    // Call the function to delete the category from the database
+    await deleteCustomCategory(supabase,customcategoryId);
+    
+    // If deletion is successful, update the UI by removing the deleted category from the state
+    setCustomCategories((prevData) => prevData.filter((item) => item.id !== customcategoryId));
+    
+    console.log('Category deleted successfully!');
+  } catch (error) {
+    console.error('Error deleting category:', error.message);
+  }
+};
+const handleDateChangeForEdit = (date) => {
+  console.log("DATE: ",date);
+  const correctformattedDate = date.toLocaleDateString('en-US', {
+    month: '2-digit', // 2-digit numeric representation of the month
+    day: '2-digit', // 2-digit numeric representation of the day
+    year: 'numeric', // Full numeric representation of the year (e.g., 2024)
+  });
+  console.log("PEDKOKDOR: ",correctformattedDate);
+  setEditStart(correctformattedDate);
+  console.log("EDIT START: ",estartDate);
+  if (date) {
+   
+    const eselectedDayOfWeek = edaysOfWeek[date.getDay()]; // Get the day name using the index
+    console.log("EDIT SELECTDAY OF WEEK :",eselectedDayOfWeek);
+    seteSelectedDay(eselectedDayOfWeek);
+    const emonthnum = date.getMonth();
+    const eday = date.getDate();
+    const eselectedMonthName = emonthNames[emonthnum];
+    seteSelectedMonth(eselectedMonthName)
+
+   
+    const eformattedDate = `${eselectedMonthName} ${eday}`;
+    console.log("EDIT FORMATTED DATE: ", eformattedDate);
+    seteSelectedDate(eformattedDate, () => {
+      // This callback function will be executed after setSelectedDate updates the state
+      console.log('Selected date:', eselectedDate);
+    });
+    console.log('Selected day of the week:', eselectedDayOfWeek);
+    const eupdatedTimes = times.map((time) => {
+      if (time.id === 3) {
+        return { ...time, name: `Weekly on ${eselectedDayOfWeek}` };
+      }
+      if (time.id === 4) {
+        return { ...time, name: `Monthly on the fourth ${eselectedDayOfWeek}` };
+      }
+      if (time.id === 5) {
+        return { ...time, name: `Annually on ${eformattedDate}` };
+      }
+      return time;
+    });
+    console.log('Updated times:', eupdatedTimes);
   }
 };
 
@@ -305,6 +375,8 @@ const handleDateChange = (date) => {
       // This callback function will be executed after setSelectedDate updates the state
       console.log('Selected date:', selectedDate);
     });
+
+    
 
 
 
@@ -340,10 +412,10 @@ const handleCustomRecurrenceSubmit = () => {
 
 
   let formattedEndOption = "";
-  if (endOption === "Never"){
+  if (editend||endOption === "Never"){
     formattedEndOption = "Never";
   }
-  else if (endOption === "OnDate") {
+  else if (editend||endOption === "OnDate") {
     let formattedEndDate = endDate.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
@@ -351,17 +423,52 @@ const handleCustomRecurrenceSubmit = () => {
       year: 'numeric'
     });
     formattedEndOption = formattedEndDate;
-  } else if (endOption === "AfterOccurrences") {
+  } else if (editend||endOption === "AfterOccurrences") {
     formattedEndOption = "After "+ occurrences + " Occurrences";
   }
 
-  setEndOption(formattedEndOption);
+  if (editend !== null) {
+    setEditEnd(formattedEndOption);
+  } else {
+    setEndOption(formattedEndOption);
+  }
   setSelectedTime("Every "+repeatInterval+" "+ repeatUnit);
   // Close the pop-up after submission
   setShowCustomDialog(false);
 };
 
+//HANDLES FOR EDIT 
 
+
+const handleEdit = (item) => {
+  setShowEditDialog(true);
+  setEditItemData(item);
+  
+  console.log("THIS IS CATEGORY FOR ITEM: ",item.category);
+  console.log("THIS IS OUR ITEM: ",item);
+  setEditCategory(item.category);
+  console.log(editcategory);
+  setEditPrice(item.price);
+  setEditStart(item.started_at);
+  setEditTime(item.time);
+  setEditEnd(item.end_at);
+  
+};
+
+const handleEditSubmit = async () => {
+  try {
+    // Call your update function here passing the edited data
+    // Example: await updateItem(editItemData);
+
+    // Close the edit dialog after successful update
+    setShowEditDialog(false);
+
+    // Optionally, update the state to reflect the changes immediately
+    // Example: setItems(updatedItems);
+  } catch (error) {
+    console.error('Error updating item:', error);
+  }
+};
   
 
   return (    
@@ -433,7 +540,7 @@ const handleCustomRecurrenceSubmit = () => {
   <div className="mt-4 w-1/2">
     <h3 className="text-lg font-semibold mb-2 text-black">Custom Categories</h3>
     <div className="flex flex-wrap -mx-2">
-      {customCategories.map((category, index) => {
+      {customCategories.map((category) => {
         return (
           <div key={category.id} className="w-1/3 px-2 mb-4">
             <div className="bg-gray-100 p-2 rounded-md flex justify-between items-center">
@@ -606,16 +713,24 @@ const handleCustomRecurrenceSubmit = () => {
       <div className="mb-4">
         <label htmlFor="ends" className="block text-sm font-medium text-gray-700">Ends</label>
         <select
-          id="ends"
-          value={endOption}
-          onChange={(e) => setEndOption(e.target.value)}
-          className="text-black mt-1 px-4 py-2 w-48 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-        >
+  id="ends"
+  value={editend !== null ? editend : endOption}
+  onChange={(e) => {
+    const selectedValue = e.target.value;
+    if (editend !== null) {
+      setEditEnd(selectedValue); // Set editEnd if not null
+    } else {
+      setEndOption(selectedValue); // Set endOption if editEnd is null
+    }
+  }}
+  className="text-black mt-1 px-4 py-2 w-48 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+>
           <option value="Never">Never</option>
           <option value="OnDate">On a specific date</option>
           <option value="AfterOccurrences">After a number of occurrences</option>
         </select>
-        {endOption === "OnDate" && (
+        {console.log("Logging here: ",editend)}
+        {(editend||endOption) === "OnDate" && (
           <ReactDatePicker
           selected={endDate} // Pass the selected date
           onChange={(date) => setEndDate(date)} // Handle date change
@@ -623,14 +738,17 @@ const handleCustomRecurrenceSubmit = () => {
           placeholderText="Select end date" // Placeholder text
         />
         )}
-        {endOption === "AfterOccurrences" && (
+        {console.log("Logging here ENDDATE: ",endDate)}
+        {(editend || endOption) === "AfterOccurrences" && (
           <input
             type="number"
             value={occurrences}
             onChange={(e) => setOccurrences(e.target.value)}
             className="text-black mt-1 px-4 py-2 w-24 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm mr-2"
           />
+          
         )}
+        {console.log("Logging here OCCC: ",occurrences)}
       </div>
 
             {/* Submit and Cancel Buttons */}
@@ -715,6 +833,122 @@ const handleCustomRecurrenceSubmit = () => {
         </table>
       </div>
     </div>
+    {/* Render the edit dialog based on the showEditDialog state */}
+    {showEditDialog && (
+  <div className="fixed z-10 inset-0 overflow-y-auto">
+    <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+      <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+      <div className="relative bg-white w-96 rounded-lg">
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-gray-100">
+          <h2 className="text-lg font-semibold text-gray-800">Edit Item</h2>
+          <div className="flex">
+            <button
+              onClick={() => handleSaveEdit()}
+              className="text-indigo-600 hover:text-indigo-800 font-medium mr-2 focus:outline-none"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setShowEditDialog(false)}
+              className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+        
+        <div className="p-6">
+          {/* Edit dialog content */}
+          <ul className="text-black divide-y divide-gray-200">
+            <li className="py-2 ">
+              <label className="text-black block font-medium">Category: {editcategory} </label>
+              <select
+              value={editcategory}
+              onChange={(e) => setEditCategory(e.target.value)}
+              className="text-center block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+              style={{ margin: 'auto' }}
+            >
+            <option value= "">Select a category</option>
+              {combinedCategories
+              .sort((a, b) => a.name.localeCompare(b.name)) // Sort categories alphabetically by name
+              .map((category) => (
+            <option key={category.id} value={category.name}>
+            {category.name}
+            </option>
+            ))}
+            </select>
+            </li>
+            <li className="py-2">
+              <label className="block font-medium text-gray-800">Started At: {editstart}</label>
+              <ReactDatePicker
+              
+              selected={editstart} // Pass the selected date
+              onChange={handleDateChangeForEdit} // Handle date change
+              className="text-center block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+              style={{ margin: 'auto' }}
+              placeholderText="Select starting day" // Placeholder text
+            />
+            </li>
+            <li className="py-2">
+              <label className="text-black block font-medium">Time: {edittime}</label>
+              <select
+              value={edittime}
+              onChange={(e) => {
+                const eselectedValue = e.target.value;
+                if (eselectedValue === 'Custom...') {
+                  handleCustomDialog(); // Call the function to handle opening the custom dialog
+                } else {
+                  // Set selectedValue based on multiple conditions
+                  if (times.find(time => time.name === eselectedValue)) {
+                    const eselectedTimeObj = times.find(time => time.name === eselectedValue);
+                    if (eselectedTimeObj.id === 3 && eselectedDay) {
+                      setEditTime(`Weekly on ${eselectedDay}`);
+                    } else if (eselectedTimeObj.id === 4 && eselectedDay) {
+                      setEditTime(`Monthly on the fourth ${eselectedDay}`);
+                    } else if (eselectedTimeObj.id === 5 && eselectedDate) {
+                      setEditTime(`Annually on ${eselectedDate}`);
+                    } else {
+                      setEditTime(eselectedValue);
+                    }
+                  }
+                }
+              }}
+              className="text-center block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+              style={{ margin: 'auto' }}
+            >
+              <option value="">Select a Time</option>
+              {times.map((times) => (
+                <option key={times.id} value={times.name}>
+                  {times.id === 3 && eselectedDay ? `Weekly on ${eselectedDay}` : times.id === 5 && eselectedDate ? `Annually on ${eselectedDate}`: times.id === 4 && eselectedDay ? `Monthly on the fourth ${eselectedDay}`: times.name}
+                  
+                </option>
+              ))}
+              {/* Add a custom option that triggers the pop-up */}
+              <option value="Custom..." >Custom...</option>
+              </select>
+            </li>
+            <li className="py-2">
+              <label className="text-black block font-medium">Ends On: {editend}</label>
+              
+            </li>
+            <li className="py-2">
+              <label className="text-black block font-medium">Price: ${editprice}</label>
+              <input
+              type="text"
+              value={price}
+              onChange={(e) => setnewprice(e.target.value)}
+              className="text-center block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+              style={{ margin: 'auto' }}
+              placeholder="Enter Price"
+            />
+            </li>
+            {/* Add similar select elements for other properties */}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
   </div>
   )}
-  

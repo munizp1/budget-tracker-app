@@ -75,6 +75,7 @@ export default function Homepage() {
     
       
         {modelClicked ? (
+          
           <Dashboard/>
            // Render a blank screen when modelClicked is true
         ) : (

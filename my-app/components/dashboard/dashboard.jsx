@@ -8,7 +8,7 @@ const Dashboard = () => {
             {/* Temporary link to addPayments 4 page */}
             <div className=" bg-gray-900">
             <div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3">
-            <li><a href="/addpayment4"> ADD PAYMENT BUTTON</a></li>
+            <li><a href="/ManageExpensesPage"> ADD PAYMENT BUTTON</a></li>
         
             </div>
             </div>
@@ -49,7 +49,7 @@ const Dashboard = () => {
                 <p>&copy; 2024 Budget Tracking App. All rights reserved.</p>
             </footer>
             
-            <link rel="stylesheet" href="https://classless.de/classless.css" />
+            
         </div>
     );
 }

@@ -1,11 +1,11 @@
 import Layout from "../../components/layout"
-import Modelpage from '../../components/model/Modelpage'
+import Contactpage from '../../components/contact/Contactpage'
 
 export default function Dashboard() {
   
   return (
     <Layout>
-      <Modelpage />
+      <Contactpage />
     </Layout>
   )
 }
