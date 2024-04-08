@@ -72,7 +72,7 @@ export async function getCustomCategory(supabase, user) {
          const { data:Categories, error } = await supabase
          
              .from("Categories")
-             .select("name")
+             .select("*")
              .eq("profileId_Category", user[0].profile_id);
              
              
@@ -232,6 +232,34 @@ export async function deleteCategory (supabase, categoryId) {
         throw error;
     }
 }
+
+
+export async function deleteCustomCategory (supabase, customcategoryId) {
+   
+    console.log("CATEGORY IDDD FOR CUSTOM DELETE: ", customcategoryId);
+ 
+    try {
+        const { data:payment, error } = await supabase
+            .from('Categories')
+            .delete()
+            .eq('id', customcategoryId) 
+            
+        
+        
+        if (error) {
+            console.log("ERRORRRRRRRR")
+            throw error;
+        }
+        
+       
+
+        
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
+
 
 
 

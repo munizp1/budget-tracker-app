@@ -1,11 +1,12 @@
 import Layout from "../../components/layout"
-import Contactpage from '../../components/contact2/Contactpage'
+//import Categorypage from '@/components/category/Categorypage'
+
 
 export default function Dashboard() {
   
   return (
     <Layout>
-      <Contactpage />
+      
     </Layout>
   )
 }

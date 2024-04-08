@@ -12,6 +12,7 @@ import {Suspense} from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import {OrbitControls} from '@react-three/drei'
 import Homepage from '../../components/homepage/homepage'
+import Dashboard from '@/components/dashboard/dashboard'
 
 export default async function ProtectedPage() {
   const supabase = createClient();
@@ -53,6 +54,7 @@ export default async function ProtectedPage() {
       </div>
     </div>
     <Homepage/>
+    
     </Layout>
   ):(
     <div>
