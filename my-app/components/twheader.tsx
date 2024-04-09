@@ -1,3 +1,4 @@
+''
 import React from "react";
 import Link from 'next/link';
 import { createClient } from "@/utils/supabase/server";
@@ -23,10 +24,13 @@ export default function TWHeader() {
         <div className="tw-brand">
           <h1>Budget Tracker</h1>
         </div>
-          <li><a href="/protected">Home</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Services</a></li>
-          <li><a href="/contact2">Contact</a></li>
+          <li><a href="/Dashboard">Home</a></li>
+          <li><a href="/ManageExpensesPage">ManageExpenses</a></li>
+          <li><a href="/SavingsGoals">Saving Goals</a></li>
+          <li><a href="/UpcomingPayments">Upcoming Payments</a></li>
+          <li><a href="/ManageGoals">Manage Goals</a></li>
+          <li><a href="/About">About</a></li>
+          <li><a href="/contact">Contact</a></li>
           {isSupabaseConnected && <SignUpButton />}
           {isSupabaseConnected && <AuthButton />}
          
