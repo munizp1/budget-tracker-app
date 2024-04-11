@@ -261,5 +261,31 @@ export async function deleteCustomCategory (supabase, customcategoryId) {
 }
 
 
+export async function updateCategory (supabase, categoryId,editcategory,editstart,edittime,editend,editprice) {
+   
+    console.log("CATEGORY IDDD  UPDATE: ", categoryId);
+    console.log("BBBBBBBBBBBBBBBBBBBBBBBB");
+    try {
+        const { data:payment, error } = await supabase
+            .from('payment')
+            .update({ category: editcategory, started_at: editstart, time: edittime, end_at:editend, price:editprice   })
+            .eq('id', categoryId) 
+            
+        
+        
+        if (error) {
+            console.log("ERRORRRRRRRR")
+            throw error;
+        }
+        
+       
+
+        
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
+
 
 

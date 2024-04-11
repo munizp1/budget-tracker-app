@@ -1,6 +1,6 @@
 'use client';
 import { useState,useEffect } from 'react'
-import {deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
+import {updateCategory,deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
 import { createClient } from "@/utils/supabase/client";
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
@@ -72,6 +72,7 @@ export default function Categorypage() {
   const [editcategory, setEditCategory]=useState(null);
   const [edittime, setEditTime]=useState(null);
   const [editstart, setEditStart]=useState(null);
+ 
   const [editend, setEditEnd]=useState(null);
 
   const [estartDate, seteStartDate] = useState(null); // Define startDate state
@@ -83,6 +84,10 @@ export default function Categorypage() {
   const [eselectedDay, seteSelectedDay] = useState(null);
   const [eselectedMonth, seteSelectedMonth] = useState(null);
   const [eselectedDate, seteSelectedDate] = useState(null);
+
+  const [editend2, setEditEnd2]=useState('');
+  const [formattededitend2, setFormattedEditEnd2]=useState('');
+  const [editoccurrences, setEditOccurrences] = useState(0); // Define occurrences state('');
 
 
   
@@ -408,6 +413,10 @@ const handleCustomRecurrenceSubmit = () => {
   console.log('Custom Recurrence:', customRecurrence);
   console.log("Every "+repeatInterval+" "+ repeatUnit);
   console.log(endOption);
+  console.log("ENNNNNNDDDDDDDD: ",editend2)
+  
+  
+
   
 
 
@@ -415,7 +424,16 @@ const handleCustomRecurrenceSubmit = () => {
   if (editend||endOption === "Never"){
     formattedEndOption = "Never";
   }
-  else if (editend||endOption === "OnDate") {
+
+  if (editend === "OnDate") {
+    let formattedEndDate = editend2.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    formattedEndOption = formattedEndDate;
+  } else if (endOption === "OnDate") {
     let formattedEndDate = endDate.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
@@ -423,7 +441,13 @@ const handleCustomRecurrenceSubmit = () => {
       year: 'numeric'
     });
     formattedEndOption = formattedEndDate;
-  } else if (editend||endOption === "AfterOccurrences") {
+  }
+  if (editend === "AfterOccurrences") {
+    
+    formattedEndOption = "After "+ editoccurrences + " Occurrences";
+  }
+
+  else if (endOption === "AfterOccurrences") {
     formattedEndOption = "After "+ occurrences + " Occurrences";
   }
 
@@ -432,11 +456,24 @@ const handleCustomRecurrenceSubmit = () => {
   } else {
     setEndOption(formattedEndOption);
   }
-  setSelectedTime("Every "+repeatInterval+" "+ repeatUnit);
+  if (edittime !== null) {
+    setEditTime("Every "+repeatInterval+" "+ repeatUnit);
+  } else {
+    setSelectedTime("Every "+repeatInterval+" "+ repeatUnit);
+  }
+
+  
   // Close the pop-up after submission
   setShowCustomDialog(false);
 };
 
+useEffect(() => {
+  console.log("STOP :", editend);
+
+}, [editend]);
+
+
+console.log("FINAL: ", editend);
 //HANDLES FOR EDIT 
 
 
@@ -455,18 +492,27 @@ const handleEdit = (item) => {
   
 };
 
-const handleEditSubmit = async () => {
+const handleSaveEdit = async (categoryId) => {
   try {
     // Call your update function here passing the edited data
     // Example: await updateItem(editItemData);
-
+    console.log("THIS IS ID OF EDIT ITEM: ",categoryId.id);
+    console.log(editcategory);
+    console.log(editstart);
+    console.log(edittime);
+    console.log(editend);
+    console.log(editprice);
+   
+    // Call the function to delete the category from the database
+    await updateCategory(supabase,categoryId.id,editcategory,editstart,edittime,editend,editprice);
+    
     // Close the edit dialog after successful update
     setShowEditDialog(false);
 
     // Optionally, update the state to reflect the changes immediately
     // Example: setItems(updatedItems);
   } catch (error) {
-    console.error('Error updating item:', error);
+    console.error('Error updating Edited item:', error);
   }
 };
   
@@ -717,6 +763,7 @@ const handleEditSubmit = async () => {
   value={editend !== null ? editend : endOption}
   onChange={(e) => {
     const selectedValue = e.target.value;
+    {console.log("OOOOOOOO: ",selectedValue)}
     if (editend !== null) {
       setEditEnd(selectedValue); // Set editEnd if not null
     } else {
@@ -730,24 +777,38 @@ const handleEditSubmit = async () => {
           <option value="AfterOccurrences">After a number of occurrences</option>
         </select>
         {console.log("Logging here: ",editend)}
-        {(editend||endOption) === "OnDate" && (
+        {(editend === "OnDate") ? (
           <ReactDatePicker
-          selected={endDate} // Pass the selected date
-          onChange={(date) => setEndDate(date)} // Handle date change
+          selected={editend2} // Use editend directly for selected date
+          onChange={(date) => setEditEnd2(date)} // Handle date change for editend
           className="text-black block mt-1 px-4 py-2 w-48 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
           placeholderText="Select end date" // Placeholder text
-        />
-        )}
+          />
+          ) : (endOption === "OnDate" && (
+          <ReactDatePicker
+          selected={endDate} // Use endDate for selected date
+          onChange={(date) => setEndDate(date)} // Handle date change for endDate
+          className="text-black block mt-1 px-4 py-2 w-48 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+          placeholderText="Select end date" // Placeholder text
+          />
+        ))}
         {console.log("Logging here ENDDATE: ",endDate)}
-        {(editend || endOption) === "AfterOccurrences" && (
+        
+        {(editend === "AfterOccurrences") ? (
           <input
+          type="number"
+          value={editoccurrences}
+          onChange={(e) => setEditOccurrences(e.target.value)}
+          className="text-black mt-1 px-4 py-2 w-24 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm mr-2"
+        />
+          ) : (endOption === "AfterOccurrences" && (
+            <input
             type="number"
             value={occurrences}
             onChange={(e) => setOccurrences(e.target.value)}
             className="text-black mt-1 px-4 py-2 w-24 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm mr-2"
           />
-          
-        )}
+        ))}
         {console.log("Logging here OCCC: ",occurrences)}
       </div>
 
@@ -843,7 +904,7 @@ const handleEditSubmit = async () => {
           <h2 className="text-lg font-semibold text-gray-800">Edit Item</h2>
           <div className="flex">
             <button
-              onClick={() => handleSaveEdit()}
+              onClick={() => handleSaveEdit(editItemData)}
               className="text-indigo-600 hover:text-indigo-800 font-medium mr-2 focus:outline-none"
             >
               Save
@@ -924,7 +985,7 @@ const handleEditSubmit = async () => {
                 </option>
               ))}
               {/* Add a custom option that triggers the pop-up */}
-              <option value="Custom..." >Custom...</option>
+              <option value="Custom...">Custom...</option>
               </select>
             </li>
             <li className="py-2">
@@ -935,8 +996,14 @@ const handleEditSubmit = async () => {
               <label className="text-black block font-medium">Price: ${editprice}</label>
               <input
               type="text"
-              value={price}
-              onChange={(e) => setnewprice(e.target.value)}
+              value={editprice}
+              onChange={(e) => {const input = e.target.value;
+                // Check if the input is a valid float number
+                if (/^\d*\.?\d*$/.test(input)) {
+                  setEditPrice(input);
+                }
+              
+              }}
               className="text-center block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
               style={{ margin: 'auto' }}
               placeholder="Enter Price"

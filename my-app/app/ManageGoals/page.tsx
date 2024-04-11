@@ -1,12 +1,12 @@
 import Layout from "../../components/layout"
-//import Categorypage from '@/components/category/Categorypage'
+import Pie from '@/components/Goals/script';
 
 
 export default function Dashboard() {
   
   return (
     <Layout>
-      
+         <Pie/>
     </Layout>
   )
 }
