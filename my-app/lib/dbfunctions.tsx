@@ -288,4 +288,30 @@ export async function updateCategory (supabase, categoryId,editcategory,editstar
 }
 
 
+export async function updateUserBalance (supabase, customerId,balance) {
+   
+    console.log("CustomerID for UPDATE Balance: ", customerId);
+
+    try {
+        const { data:profile, error } = await supabase
+            .from('profile')
+            .update({ balance: balance})
+            .eq('id', customerId) 
+            
+        
+        
+        if (error) {
+            console.log("ERRORRRRRRRR")
+            throw error;
+        }
+        
+       
+
+        
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
+
 

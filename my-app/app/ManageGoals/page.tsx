@@ -1,12 +1,12 @@
 import Layout from "../../components/layout"
-import Pie from '@/components/Goals/script';
 
+import GoalList from '@/components/Goals/script';
 
 export default function Dashboard() {
   
   return (
     <Layout>
-         <Pie/>
+         <GoalList/>
     </Layout>
   )
 }
