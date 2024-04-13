@@ -31,7 +31,7 @@ export default async function AuthButton() {
 
     const supabase = createClient();
     await supabase.auth.signOut();
-    return redirect("/notes");
+    return redirect("/");
   };
   const userProfile = await fetchUserProfile();
 

@@ -18,6 +18,7 @@ const Pie = ({data}) => (
         padAngle={0.7}
         cornerRadius={3}
         activeOuterRadiusOffset={8}
+        colors={{ scheme: 'yellow_orange_red' }}
         borderWidth={1}
         borderColor={{
             from: 'color',
@@ -32,6 +33,7 @@ const Pie = ({data}) => (
         arcLinkLabelsTextColor="#333333"
         arcLinkLabelsThickness={2}
         arcLinkLabelsColor={{ from: 'color' }}
+        arcLabel="value"
         arcLabelsSkipAngle={10}
         arcLabelsTextColor={{
             from: 'color',
@@ -62,14 +64,15 @@ const Pie = ({data}) => (
                 spacing: 10
             }
         ]}
+        
         legends={[
             {
-                anchor: 'bottom',
-                direction: 'row',
+                anchor: 'top-right',
+                direction: 'column',
                 justify: false,
-                translateX: 0,
-                translateY: 56,
-                itemsSpacing: 0,
+                translateX: -25,
+                translateY: 100,
+                itemsSpacing: 5,
                 itemWidth: 100,
                 itemHeight: 18,
                 itemTextColor: '#999',
