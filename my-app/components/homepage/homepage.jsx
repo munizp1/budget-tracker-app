@@ -1,37 +1,27 @@
 'use client'
-import { useState,useEffect } from 'react'
-import { StarIcon } from '@heroicons/react/20/solid'
-import { RadioGroup } from '@headlessui/react'
-import {Model} from "../modeldata.js"
-import { Canvas,useLoader } from "@react-three/fiber";
-import {Suspense} from 'react'
-import THREE from "three";
-import {OrbitControls, Text} from '@react-three/drei'
-import { getProfile_id } from '../../lib/dbfunctions'
+import { useState, useEffect } from 'react'
+import { Model } from "../modeldata.js"
+import { Canvas } from "@react-three/fiber";
+import { Suspense } from 'react'
+import { OrbitControls, Text } from '@react-three/drei'
+import { updateUserBalance,getProfile_id} from '../../lib/dbfunctions'
 import { createClient } from "@/utils/supabase/client";
 
 import Dashboard from '@/components/dashboard/dashboard'
 
-
-  
-
-
-
-
 export default function Homepage() {
-
   const [user, setUser] = useState(null);
   const [customer_id, setCustomer_id] = useState(null);
   const supabase = createClient();
-  const [clickCount, setClickCount] = useState(0); // State to track the number of clicks
   const [modelClicked, setModelClicked] = useState(false);
-  
+  const [showBalancePopup, setShowBalancePopup] = useState(false);
+  const [balanceInput, setBalanceInput] = useState('');
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const { data } = await supabase.auth.getUser();
-        setUser(data.user.id); // Update user state with fetched user data
-        
+        setUser(data.user.id);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -40,12 +30,9 @@ export default function Homepage() {
     fetchUserData();
   }, []);
 
-  console.log("USER MODELPAGE:", user)
-
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
-        
         const profileId = await getProfile_id(supabase, user);
         console.log("Profile:", profileId);
         setCustomer_id(profileId);
@@ -57,29 +44,42 @@ export default function Homepage() {
     fetchCustomerData();
   }, [user]);
 
-
-  
-  console.log(user)
   const handleModelClick = () => {
-    setClickCount(prevCount => prevCount + 1); // Increment click count on each click
-    if (clickCount === 1) {
-      setModelClicked(true); // Set modelClicked to true on second click
+    if (customer_id[0]?.balance === null) {
+      setShowBalancePopup(true);
+    }
+    else {
+      setModelClicked(true);
     }
   };
+
+  const handleSaveBalance = async() => {
+    
+    try {
+     
+    console.log('Saving balance:', balanceInput);
+     console.log('customer ID: ', customer_id[0].id)
+      // Call the function to delete the category from the database
+      await updateUserBalance(supabase,customer_id[0].id, balanceInput);
+      
+      // Close the edit dialog after successful update
+      setShowBalancePopup(false);
+      setModelClicked(true);
+      // Optionally, update the state to reflect the changes immediately
+      // Example: setItems(updatedItems);
+    } catch (error) {
+      console.error('Error updating Balance:', error);
+    }
+  };
+
   
 
   return (
-    
-    
     <div className="py-20 lg:col-span-32 lg:col-start-1 lg:border-r lg:border-gray-800 lg:pt-6 lg:pb-16 lg:pr-8">
-    
-      
-        {modelClicked ? (
-          
-          <Dashboard/>
-           // Render a blank screen when modelClicked is true
-        ) : (
-          <div className="h-screen bg-gray-900">
+      {modelClicked ? (
+        <Dashboard />
+      ) : (
+        <div className="h-screen bg-gray-900">
           <Canvas camera={{ position: [0, 0, 2] }}>
             <Suspense fallback={null}>
               <ambientLight />
@@ -90,7 +90,7 @@ export default function Homepage() {
               <Model
                 position={[-0.5, 0, 0]}
                 rotation={[1.57, -1.57, 0]}
-                onClick={handleModelClick} // Call handleModelClick function when the model is clicked
+                onDoubleClick={handleModelClick} // Use onDoubleClick event
               />
               {customer_id && (
                 <Text
@@ -106,10 +106,41 @@ export default function Homepage() {
               <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
             </Suspense>
           </Canvas>
-          </div>
-        )}
-      
-    
-  </div>
-);
+        </div>
+      )}
+      {showBalancePopup && <div className="fixed inset-0 overflow-y-auto z-50 flex justify-center items-center">
+      <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <div className="relative bg-white p-4 rounded-lg">
+        <h3 className="text-lg text-black font-semibold mb-4">BALANCE</h3>
+        <input
+          type="text" // Set input type to number
+          step="0.01" // Allow decimal numbers with two decimal places
+          
+          value={balanceInput}
+          onChange={(e) => {const input = e.target.value;
+            // Check if the input is a valid float number
+            if (/^\d*\.?\d*$/.test(input)) {
+              setBalanceInput(input);
+            }
+          
+          }}
+          placeholder="Enter your balance"
+          
+          className="text-black border rounded-md p-2 w-full mb-4"
+        />
+        
+        <div className="flex justify-end">
+          <button
+            onClick={handleSaveBalance}
+            className="inline-flex justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>}
+    </div>
+  );
 }

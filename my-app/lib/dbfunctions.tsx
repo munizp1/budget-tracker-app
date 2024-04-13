@@ -261,5 +261,57 @@ export async function deleteCustomCategory (supabase, customcategoryId) {
 }
 
 
+export async function updateCategory (supabase, categoryId,editcategory,editstart,edittime,editend,editprice) {
+   
+    console.log("CATEGORY IDDD  UPDATE: ", categoryId);
+    console.log("BBBBBBBBBBBBBBBBBBBBBBBB");
+    try {
+        const { data:payment, error } = await supabase
+            .from('payment')
+            .update({ category: editcategory, started_at: editstart, time: edittime, end_at:editend, price:editprice   })
+            .eq('id', categoryId) 
+            
+        
+        
+        if (error) {
+            console.log("ERRORRRRRRRR")
+            throw error;
+        }
+        
+       
+
+        
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
+
+
+export async function updateUserBalance (supabase, customerId,balance) {
+   
+    console.log("CustomerID for UPDATE Balance: ", customerId);
+
+    try {
+        const { data:profile, error } = await supabase
+            .from('profile')
+            .update({ balance: balance})
+            .eq('id', customerId) 
+            
+        
+        
+        if (error) {
+            console.log("ERRORRRRRRRR")
+            throw error;
+        }
+        
+       
+
+        
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
 
 

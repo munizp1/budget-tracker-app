@@ -1,9 +1,5 @@
 'use client';
-import { useState,useEffect } from 'react'
-import {deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
-import { createClient } from "@/utils/supabase/client";
-import ReactDatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
+
 
 
 export default function Aboutmepage() {
