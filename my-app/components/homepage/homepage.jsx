@@ -75,7 +75,7 @@ export default function Homepage() {
   
 
   return (
-    <div className="py-20 lg:col-span-32 lg:col-start-1 lg:border-r lg:border-gray-800 lg:pt-6 lg:pb-16 lg:pr-8">
+    <div className=" lg:col-span-32 lg:col-start-1 lg:border-r lg:border-gray-800   ">
       {modelClicked ? (
         <Dashboard />
       ) : (
@@ -103,7 +103,7 @@ export default function Homepage() {
                   {customer_id[0].first_name} {customer_id[0].last_name}
                 </Text>
               )}
-              <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
+              <OrbitControls enablePan={true} enableZoom={false} enableRotate={true} />
             </Suspense>
           </Canvas>
         </div>

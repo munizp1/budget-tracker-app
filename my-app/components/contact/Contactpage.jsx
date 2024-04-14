@@ -12,7 +12,9 @@ function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
+      <div className="py-6 font-bold bg-stone-400 text-center"></div>
+    <form className="py-6" onSubmit={handleSubmit}>
       <label htmlFor="name">Name:</label>
       <input
         id="name"
@@ -64,6 +66,7 @@ function ContactForm() {
         Submit
       </button>
     </form>
+    </div>
   );
 }
 

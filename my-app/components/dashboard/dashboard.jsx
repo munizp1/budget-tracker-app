@@ -229,7 +229,7 @@ console.log("DATAAAAA: ",formattedData);
     <div className="dashboard-container">
         {/* All below is Dashboard */}
         <header className="header" style={{ height: '400px' }}>
-            <h1 className='text-center'>Income</h1>
+            <h1 className='text-center'>Monthly Spendings</h1>
             <Pie data={formattedData} /> {/* Render the Pie component here */}
         </header>
         {/* Other components and sections */}
