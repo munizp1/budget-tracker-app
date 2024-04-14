@@ -519,7 +519,12 @@ const handleSaveEdit = async (categoryId) => {
 
   return (    
     <div className="bg-white">
+      <div className="py-6 font-bold bg-stone-400 text-center">
+          
+     
+      </div>
     <div className="pt-6">
+      
       {/* SHOW CURRENT INCOME */}
       <div className="flex justify-center mb-8">
         <div className="bg-gray-200 p-4 rounded-md">
