@@ -3,7 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { SubmitButton } from "./submit-button";
+import { SubmitButton } from "../../components/login/submit-button";
 
 export default function Login({
   searchParams,
@@ -30,7 +30,7 @@ export default function Login({
       return redirect("/login?message=Could not authenticate user");
     }
     console.log("Session ID:", user.id);
-    return redirect("/protected");
+    return redirect("/Dashboard");
   };
 
   
@@ -49,7 +49,7 @@ export default function Login({
     <div className="w-full min-h-screen flex flex-col items-center">
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
       <Link
-        href="/notes"
+        href="/"
         className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
       >
         <svg
