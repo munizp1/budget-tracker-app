@@ -3,7 +3,7 @@ import React from 'react';
 import Pie from '@/components/dashboard/pie';
 import { createClient } from "@/utils/supabase/client";
 import { useState,useEffect } from 'react'
-import { getProfile_id,getPaymentData} from '../../lib/dbfunctions'
+import { getProfile_Income,getProfile_Balance,getProfile_id,getPaymentData} from '../../lib/dbfunctions'
 
 
 
@@ -54,7 +54,8 @@ const [totalPrice, setTotalPrice] = useState(0); // State to hold the total pric
 const [currentDate, setCurrentDate] = useState(new Date()); // State to hold the current date
 const [currentendDate, setCurrentEndDate] = useState(new Date()); // State to hold the current date
 const [paymentMaps, setPaymentMaps] = useState([]);
-
+const [balance, setBalance] = useState(" ");
+const [income, setIncome] = useState(" ");
 
 
 useEffect(() => {
@@ -78,6 +79,7 @@ useEffect(() => {
     try {
       
       const profileId = await getProfile_id(supabase, user);
+      
       console.log("Profile:", profileId);
       setCustomer_id(profileId);
     } catch (error) {
@@ -88,6 +90,23 @@ useEffect(() => {
   fetchCustomerData();
 }, [user]);
 console.log("customerID:", customer_id);
+
+useEffect(() => {
+  const fetchIncomeData = async () => {
+    try {
+      
+      const profileBalance = await getProfile_Balance(supabase, user);
+      const profileIncome = await getProfile_Income(supabase, user);
+      console.log("Profile Balance:",profileBalance[0].balance);
+      setBalance(profileBalance[0].balance);
+      setIncome(profileIncome[0].income);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  fetchIncomeData();
+}, [user]);
 
 useEffect(() => {
   const nextMonthDate = new Date(currentDate);
@@ -141,21 +160,33 @@ useEffect(() => {
         const interval = parseInt(time.split(' ')[1]);
         
         let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 1st: ", paymentDate);
 
         while (paymentDate <= currentendDate) {
-          newPaymentMap.set(paymentDate.toDateString(), price);
           paymentDate.setDate(paymentDate.getDate() + interval);
+          console.log("For Days: ",paymentDate);
+          if (paymentDate >= currentDate){
+            newPaymentMap.set(paymentDate.toDateString(), price);
+          }
+          
+          
         }
 
       }
       else if(time.includes('Every') && time.includes('weeks') && endDate == 'Never') {
         const interval = parseInt(time.split(' ')[1]);
-        
+        const total = interval*7 
         let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 2nd: ", paymentDate);
 
         while (paymentDate <= currentendDate) {
+          paymentDate.setDate(paymentDate.getDate() + total);
+          console.log("For weeks: ",paymentDate);
+          if (paymentDate >= currentDate && paymentDate<=currentendDate){
           newPaymentMap.set(paymentDate.toDateString(), price);
-          paymentDate.setDate(paymentDate.getDate() + (interval*7));
+          }
         }
 
       }
@@ -163,28 +194,132 @@ useEffect(() => {
         const interval = parseInt(time.split(' ')[1]);
         
         let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 3rd: ", paymentDate);
 
         while (paymentDate <= currentendDate) {
-          newPaymentMap.set(paymentDate.toDateString(), price);
           paymentDate.setMonth(paymentDate.getMonth() + interval);
+
+          if (paymentDate >= currentDate && paymentDate<=currentendDate){
+          newPaymentMap.set(paymentDate.toDateString(), price);
+          
+          }
         }
 
       }
 
-      else if (endDate.toString().includes('After') && time.includes('Every')) {
+      else if (time.includes('Every') && time.includes('days') && endDate.toString().includes('After') ) {
         const interval = parseInt(time.split(' ')[1]);
         const endinterval= parseInt(endDate.split(' ')[1]);
         let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 4th: ", paymentDate);
 
         for (let i = 0; i < endinterval; i++) {
-          if (paymentDate <= currentendDate) {
+
+          while (paymentDate <= currentendDate) {
+            paymentDate.setDate(paymentDate.getDate() + interval);
+
+          if (paymentDate >= currentDate && paymentDate<=currentendDate ) {
               newPaymentMap.set(paymentDate.toDateString(), price);
-              paymentDate.setDate(paymentDate.getDate() + interval);
-          } else {
-              break; // Exit the loop if paymentDate exceeds currentendDate or current date
+              
+          } 
+        }
+        }
+      }
+
+
+      else if (time.includes('Every') && time.includes('weeks') && endDate.toString().includes('After') ) {
+        const interval = parseInt(time.split(' ')[1]);
+        const total = interval*7;
+        const endinterval= parseInt(endDate.split(' ')[1]);
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 4th: ", paymentDate);
+
+        for (let i = 0; i < endinterval; i++) {
+
+          while (paymentDate <= currentendDate) {
+            paymentDate.setDate(paymentDate.getDate() + total);
+
+          if (paymentDate >= currentDate && paymentDate<=currentendDate ) {
+              newPaymentMap.set(paymentDate.toDateString(), price);
+              
+          } 
+        }
+        }
+      }
+
+      else if (time.includes('Every') && time.includes('months') && endDate.toString().includes('After') ) {
+        const interval = parseInt(time.split(' ')[1]);
+        
+        const endinterval= parseInt(endDate.split(' ')[1]);
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 4th: ", paymentDate);
+
+        for (let i = 0; i < endinterval; i++) {
+
+          while (paymentDate <= currentendDate) {
+            paymentDate.setDate(paymentDate.getMonth() + interval);
+
+          if (paymentDate >= currentDate && paymentDate<=currentendDate ) {
+              newPaymentMap.set(paymentDate.toDateString(), price);
+              
+          } 
+        }
+        }
+      }
+
+      else if(time.includes('Every') && time.includes('days') && !endDate.toString().includes('After') && !endDate=='Never') {
+        const interval = parseInt(time.split(' ')[1]);
+        
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 5th: ", paymentDate);
+
+        while (paymentDate <= currentendDate) {
+          paymentDate.setDate(paymentDate.getDate() + interval);
+          console.log("For Days: ",paymentDate);
+          if (paymentDate >= currentDate && paymentDate<=endDate){
+            newPaymentMap.set(paymentDate.toDateString(), price);
           }
         }
       }
+
+      else if(time.includes('Every') && time.includes('weeks') && !endDate.toString().includes('After') && !endDate=='Never') {
+        const interval = parseInt(time.split(' ')[1]);
+        const total = interval*7
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 6th: ", paymentDate);
+
+        while (paymentDate <= currentendDate) {
+          paymentDate.setDate(paymentDate.getDate() + total);
+          console.log("For weeks with endDate: ",paymentDate);
+          if (paymentDate >= currentDate && paymentDate<=endDate){
+            newPaymentMap.set(paymentDate.toDateString(), price);
+          }
+        }
+      }
+
+      else if(time.includes('Every') && time.includes('months') && !endDate.toString().includes('After') && !endDate=='Never') {
+        const interval = parseInt(time.split(' ')[1]);
+        
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 7th: ", paymentDate);
+
+        while (paymentDate <= currentendDate) {
+          paymentDate.setDate(paymentDate.getMonth() + interval);
+          console.log("For months with endDate: ",paymentDate);
+          if (paymentDate >= currentDate && paymentDate<=endDate){
+            newPaymentMap.set(paymentDate.toDateString(), price);
+          }
+        }
+      }
+
+      
       else if(time.includes('Every') && time.includes('days')) {
         const interval = parseInt(time.split(' ')[1]);
         console.log("HAHAHAHHAHHA");
@@ -227,6 +362,24 @@ console.log("DATAAAAA: ",formattedData);
 
   return (
     <div className="dashboard-container">
+        {/* SHOW Current Blance And Income */}
+        <div className="flex justify-center mb-8">
+  <div className="flex space-x-4">
+    {/* Current Balance */}
+    <div className="bg-gray-200 p-4 rounded-md">
+      <p className="text-lg text-center font-semibold text-black">Current Balance:</p>
+      <p className="text-xl text-center text-indigo-600">{balance ? `$${balance}` : 'Not available'}</p>
+    </div>
+    
+    {/* Current Income */}
+    <div className="bg-gray-200 p-4 rounded-md">
+      <p className="text-lg text-center font-semibold text-black">Current Income:</p>
+      <p className="text-xl text-center text-indigo-600">{income ? `$${income}` : 'Not available'}</p>
+    </div>
+  </div>
+</div>
+
+
         {/* All below is Dashboard */}
         <header className="header" style={{ height: '400px' }}>
             <h1 className='text-center'>Monthly Spendings</h1>

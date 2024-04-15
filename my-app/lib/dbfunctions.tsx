@@ -64,6 +64,38 @@ export async function getProfile_Income(supabase, user) {
     }
 }
 
+export async function getProfile_Balance(supabase, user) {
+    console.log("For BALANCE USER?",user);
+     try {
+         const { data:profile, error } = await supabase
+         
+             .from("profile")
+             .select("balance")
+             .eq("id", user);
+             
+             
+ 
+         if (error) {
+             console.log("ERROR for INCOME")
+             throw error;
+         }
+        
+ 
+         if (profile && profile.length > 0) {
+             
+             
+             
+             return profile;
+         } else {
+             console.log("No profile data found for user ID:", user.id);
+             return null;
+         }
+     } catch (error) {
+         console.error('Error getting profile:', error.message);
+         throw error;
+     }
+ }
+
 
 export async function getCustomCategory(supabase, user) {
 
@@ -100,6 +132,29 @@ export async function AddIncome(supabase, user, income) {
         
             .from("profile")
             .update({ income: income })
+            .eq("id", user[0].id);
+            
+            
+
+        if (error) {
+            console.log("ERRORRRRRRRR")
+            throw error;
+        }
+       
+
+        
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
+export async function AddBalance(supabase, user, balance) {
+   
+    try {
+        const { data:profile, error } = await supabase
+        
+            .from("profile")
+            .update({ balance: balance })
             .eq("id", user[0].id);
             
             
@@ -286,7 +341,31 @@ export async function updateCategory (supabase, categoryId,editcategory,editstar
         throw error;
     }
 }
+export async function UpdateIncomeDate(supabase, customerId,incomestart) {
+   
+    console.log("CATEGORY IDDD  UPDATE: ", customerId[0].profile_id);
+    console.log("BBBBBBBBBBBBBBBBBBBBBBBB");
+    try {
+        const { data:profile, error } = await supabase
+            .from('profile')
+            .update({ income_start_date: incomestart })
+            .eq('profile_id', customerId[0].profile_id) 
+            
+        
+        
+        if (error) {
+            console.log("ERRORRRRRRRR")
+            throw error;
+        }
+        
+       
 
+        
+    } catch (error) {
+        console.error('Error getting profile:', error.message);
+        throw error;
+    }
+}
 
 export async function updateUserBalance (supabase, customerId,balance) {
    

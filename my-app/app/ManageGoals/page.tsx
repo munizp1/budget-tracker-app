@@ -1,12 +1,11 @@
-import Layout from "../../components/layout"
+import Layout from "../../components/layout";
+import App from "../../components/Goals/script"; // Import the Application component
 
-import GoalList from '@/components/Goals/script';
+export default function ManageExpensesPage() {
 
-export default function Dashboard() {
-  
   return (
     <Layout>
-         <GoalList/>
+      <App />
     </Layout>
   )
 }

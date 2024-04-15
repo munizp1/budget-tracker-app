@@ -1,6 +1,6 @@
 'use client';
 import { useState,useEffect } from 'react'
-import {updateCategory,deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
+import {UpdateIncomeDate,AddBalance,getProfile_Balance, updateCategory,deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
 import { createClient } from "@/utils/supabase/client";
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
@@ -28,7 +28,9 @@ export default function Categorypage() {
   const [customer_id, setCustomer_id] = useState(null);
   const [user, setUser] = useState(null); 
   const [inputincome, setinputIncome] = useState();
+  const [inputbalance, setinputBalance] = useState();
   const [income, setIncome] = useState(" ");
+  const [balance, setBalance] = useState(" ");
   const supabase = createClient();
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [customCategory, setcustomCategory] = useState('');
@@ -40,7 +42,8 @@ export default function Categorypage() {
   const [paymentData, setPaymentData] = useState([]);
 
   const [customCategories, setCustomCategories] = useState([]);
-
+  const [inputincomestartdate, setInputIncomeStartDate] = useState();
+  const [incomestart, setIncomeStart] = useState();
 
   //FOR CALENDER 
  
@@ -131,8 +134,13 @@ export default function Categorypage() {
       try {
         
         const profileIncome = await getProfile_Income(supabase, user);
+        const profileBalance = await getProfile_Balance(supabase, user);
+        const profileIncomeDate = await getProfile_id(supabase, user);
         console.log("Profile Income:",profileIncome[0].income);
         setIncome(profileIncome[0].income);
+        setBalance(profileBalance[0].balance);
+        setIncomeStart(profileIncomeDate[0].income_start_date)
+       
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -173,13 +181,15 @@ export default function Categorypage() {
         // Call the AddIncome function to update the income value in the user's profile
         const updatedProfile = await AddIncome(supabase, customer_id, inputincome);
         console.log('Profile updated with income:', updatedProfile);
-
-
+        console.log("INCOME START DATE: ",inputincomestartdate);
+        await UpdateIncomeDate(supabase,customer_id, inputincomestartdate);
 
 
         const profileIncome = await getProfile_Income(supabase, user);
+        const profileIncomedate = await getProfile_id(supabase, user);
     console.log("Profile Income:",profileIncome[0].income);
     setIncome(profileIncome[0].income);
+    setIncomeStart(profileIncomedate[0].income_start_date);
 
     // Reset the input field
     setinputIncome('');
@@ -188,9 +198,34 @@ export default function Categorypage() {
     }
 };
 
-const handleCategorySelect = (category) => {
-  setSelectedCategory(category);
-  // Add your logic to handle category selection here
+const handleBalanceChange = (e) => {
+  setinputBalance(e.target.value);
+};
+const handleSubmitBalance = async (e) => {
+  e.preventDefault();
+  try {
+      // Call the AddIncome function to update the income value in the user's profile
+      const updatedProfile = await AddBalance(supabase, customer_id, inputbalance);
+      console.log('Profile updated with Balance:', updatedProfile);
+
+
+
+
+      const profileBalance = await getProfile_Balance(supabase, user);
+  console.log("Profile Balance:",profileBalance[0].balance);
+  setBalance(profileBalance[0].balance);
+
+  // Reset the input field
+  setinputIncome('');
+  } catch (error) {
+      console.error('Error updating income:', error);
+  }
+};
+
+const handleIncomeDate = (e) => {
+  
+    setInputIncomeStartDate(e.target.value);
+
 };
 const handleAddCategory = async () => {
   try {
@@ -525,36 +560,87 @@ const handleSaveEdit = async (categoryId) => {
       </div>
     <div className="pt-6">
       
-      {/* SHOW CURRENT INCOME */}
-      <div className="flex justify-center mb-8">
-        <div className="bg-gray-200 p-4 rounded-md">
-          <p className="text-lg text-center font-semibold text-black">Current Income:</p>
-          <p className="text-xl text-center text-indigo-600">{income ? `$${income}` : 'Not available'}</p>
-        </div>
+
+    
+    <div className="flex justify-center mb-8">
+  {/* Income Section */}
+  <div className="flex flex-col items-center mr-8"> {/* Added margin-right for spacing */}
+  <div className="bg-gray-200 p-20 rounded-md">
+    <p className="text-lg text-center font-semibold text-black">Start Date: {incomestart ? `${incomestart}` : 'Not available'}</p>
+    <p className="text-lg text-center font-semibold text-black">Current Income:</p>
+    <p className="text-xl text-center text-indigo-600">{income ? `$${income}` : 'Not available'}</p>
+  </div>
+  <form onSubmit={handleSubmitIncome} className="max-w-md w-full mt-4">
+    {/* Income Input Section */}
+    <div className="flex flex-col sm:flex-row mb-4">
+      <div className="mb-4 sm:mr-2 flex-1">
+        <label htmlFor="income" className="block text-sm font-medium text-gray-900">Income</label>
+        <input
+          type="text"
+          id="income"
+          name="income"
+          value={inputincome}
+          onChange={handleIncomeChange}
+          className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
+          placeholder="Enter your income"
+        />
       </div>
 
-
-      {/* INCOME */}
-      <div className="flex justify-center mb-8"> {/* Added margin-bottom for spacing */}
-        <form onSubmit={handleSubmitIncome} className="max-w-md w-full">
-          <div className="mb-4">
-            <label htmlFor="income" className="block text-sm font-medium text-gray-900">Income</label>
-            <input
-              type="text"
-              id="income"
-              name="income"
-              value={inputincome}
-              onChange={handleIncomeChange}
-              className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
-              placeholder="Enter your income"
-              
-            />
-          </div>
-          <div className="text-center">
-            <button type="submit" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Submit</button>
-          </div>
-        </form>
+      {/* Start Date Input Section */}
+      <div className="mb-4 sm:ml-1 flex-1 w-1">
+        <label htmlFor="start-date" className="block text-sm font-medium text-gray-900">Start Date</label>
+        <input
+          type="date" 
+          id="start-date"
+          name="start-date"
+          value={inputincomestartdate} 
+          onChange={handleIncomeDate} 
+          className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
+        />
       </div>
+    </div>
+
+    {/* Submit Button */}
+    <div className="flex items-center justify-center">
+      <button type="submit" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Submit</button>
+    </div>
+  </form>
+</div>
+
+
+
+
+  {/* Balance Section */}
+  <div className="flex flex-col items-center"> {/* Added flex-column styling */}
+    <div className="bg-gray-200 p-24 rounded-md">
+      <p className="text-lg text-center font-semibold text-black">Current Balance:</p>
+      <p className="text-xl text-center text-indigo-600">{balance ? `$${balance}` : 'Not available'}</p>
+    </div>
+    <form onSubmit={handleSubmitBalance} className="max-w-md w-full mt-4"> {/* Added margin-top for spacing */}
+      <div className="mb-4">
+        <label htmlFor="balance" className="block text-sm font-medium text-gray-900">Balance</label>
+        <input
+          type="text"
+          id="balance"
+          name="balance"
+          value={inputbalance}
+          onChange={handleBalanceChange}
+          className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
+          placeholder="Enter to change your Balance"
+        />
+      </div>
+      <div className="text-center">
+        <button type="submit" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+     
+
+      
+        
+
       
       {/* ADD Custom Category */}
 <div className="flex flex-col items-center">
