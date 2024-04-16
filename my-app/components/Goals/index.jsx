@@ -19,13 +19,13 @@ function App() {
         const newGoal = {
             id: goals.length + 1,
             name: newGoalName,
-            amount: newGoalAmount,
+            amount: parseFloat(newGoalAmount), // Ensure amount is a number
             currentAmount: 0
         };
         setGoals([...goals, newGoal]);
         setNewGoalName('');
         setNewGoalAmount('');
-        setShowCreateGoalModal(false); // Close the modal on submit
+        setShowCreateGoalModal(false);
     };
 
     const toggleCreateGoalModal = () => {
@@ -35,7 +35,7 @@ function App() {
     const handleAddFunds = (e) => {
         e.preventDefault();
         const updatedGoals = goals.map(goal =>
-            goal.id === modalGoalId ? { ...goal, currentAmount: parseFloat(goal.currentAmount) + parseFloat(addAmount) } : goal
+            goal.id === modalGoalId ? { ...goal, currentAmount: goal.currentAmount + parseFloat(addAmount) } : goal
         );
         setGoals(updatedGoals);
         setShowAddFundsModal(false);
@@ -61,7 +61,7 @@ function App() {
 
     const handleEditGoal = () => {
         const updatedGoals = goals.map(goal =>
-            goal.id === editId ? { ...goal, name: newGoalName, amount: newGoalAmount } : goal
+            goal.id === editId ? { ...goal, name: newGoalName, amount: parseFloat(newGoalAmount) } : goal
         );
         setGoals(updatedGoals);
         setEditId(null);
@@ -73,48 +73,54 @@ function App() {
     const openEditGoal = (goal) => {
         setEditId(goal.id);
         setNewGoalName(goal.name);
-        setNewGoalAmount(goal.amount);
+        setNewGoalAmount(goal.amount.toString());
         setShowCreateGoalModal(true);
     };
-
-    const CreateGoalModal = () => (
-        <div className="modal">
-            <div className="modal-content">
-                <span className="close" onClick={toggleCreateGoalModal}>&times;</span>
-                <h2>{editId ? 'Edit Goal' : 'Create New Goal'}</h2>
-                <form onSubmit={editId ? handleEditGoal : handleAddNewGoal}>
-                    <input
-                        type="text"
-                        value={newGoalName}
-                        onChange={(e) => setNewGoalName(e.target.value)}
-                        placeholder="Goal Name"
-                        required
-                    />
-                    <input
-                        type="number"
-                        value={newGoalAmount}
-                        onChange={(e) => setNewGoalAmount(e.target.value)}
-                        placeholder="Goal Amount"
-                        required
-                    />
-                    <button type="submit">{editId ? 'Update Goal' : 'Add Goal'}</button>
-                </form>
-            </div>
-        </div>
-    );
 
     return (
         <div className="container">
             <h1 className="header-title">Saving Goals</h1>
-            <button className="create-goal-btn" onClick={toggleCreateGoalModal}>Create Goal</button>
-            {showCreateGoalModal && <CreateGoalModal />}
+            <button onClick={toggleCreateGoalModal} className="create-goal-btn">Create Goal</button>
+            {showCreateGoalModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={toggleCreateGoalModal}>&times;</span>
+                        <h2>{editId ? 'Edit Goal' : 'Create New Goal'}</h2>
+                        <form onSubmit={editId ? handleEditGoal : handleAddNewGoal}>
+                            <div className="form-field">
+                                <label htmlFor="goalName">Goal Name:</label>
+                                <input
+                                    id="goalName"
+                                    type="text"
+                                    value={newGoalName}
+                                    onChange={(e) => setNewGoalName(e.target.value)}
+                                    placeholder="Enter goal name"
+                                    required
+                                />
+                            </div>
+                            <div className="form-field">
+                                <label htmlFor="goalAmount">Goal Amount:</label>
+                                <input
+                                    id="goalAmount"
+                                    type="number"
+                                    value={newGoalAmount}
+                                    onChange={(e) => setNewGoalAmount(e.target.value)}
+                                    placeholder="Enter goal amount"
+                                    required
+                                />
+                            </div>
+                            <button type="submit">{editId ? 'Update Goal' : 'Add Goal'}</button>
+                        </form>
+                    </div>
+                </div>
+            )}
             <ul className="goal-list">
                 {goals.map(goal => (
                     <li key={goal.id}>
-                        {goal.name} - ${goal.amount}
+                        {goal.name} - ${goal.amount.toFixed(2)}
                         <div className="progress-container">
                             <div className="progress-bar" style={{ width: `${Math.min(100, (goal.currentAmount / goal.amount) * 100)}%` }}>
-                                ${goal.currentAmount.toFixed(2)} / ${goal.amount}
+                                ${goal.currentAmount.toFixed(2)} / ${goal.amount.toFixed(2)}
                             </div>
                         </div>
                         <button onClick={() => openAddFundsModal(goal.id, goal.name)} className="add-funds-btn">Add Funds</button>
@@ -152,7 +158,6 @@ function App() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

@@ -1,8 +1,8 @@
 import Layout from "../../components/layout";
-import App from "../../components/Goals/script"; // Import the Application component
+import App from "../../components/Goals/index"; // Import the Application component
 
 export default function ManageExpensesPage() {
-
+  
   return (
     <Layout>
       <App />
