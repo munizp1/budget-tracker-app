@@ -1,6 +1,6 @@
 'use client';
 import { useState,useEffect } from 'react'
-import {deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
+import {UpdateIncomeDate,AddBalance,getProfile_Balance, updateCategory,deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
 import { createClient } from "@/utils/supabase/client";
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
@@ -28,7 +28,9 @@ export default function Categorypage() {
   const [customer_id, setCustomer_id] = useState(null);
   const [user, setUser] = useState(null); 
   const [inputincome, setinputIncome] = useState();
+  const [inputbalance, setinputBalance] = useState();
   const [income, setIncome] = useState(" ");
+  const [balance, setBalance] = useState(" ");
   const supabase = createClient();
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [customCategory, setcustomCategory] = useState('');
@@ -40,7 +42,8 @@ export default function Categorypage() {
   const [paymentData, setPaymentData] = useState([]);
 
   const [customCategories, setCustomCategories] = useState([]);
-
+  const [inputincomestartdate, setInputIncomeStartDate] = useState();
+  const [incomestart, setIncomeStart] = useState();
 
   //FOR CALENDER 
  
@@ -72,6 +75,7 @@ export default function Categorypage() {
   const [editcategory, setEditCategory]=useState(null);
   const [edittime, setEditTime]=useState(null);
   const [editstart, setEditStart]=useState(null);
+ 
   const [editend, setEditEnd]=useState(null);
 
   const [estartDate, seteStartDate] = useState(null); // Define startDate state
@@ -83,6 +87,10 @@ export default function Categorypage() {
   const [eselectedDay, seteSelectedDay] = useState(null);
   const [eselectedMonth, seteSelectedMonth] = useState(null);
   const [eselectedDate, seteSelectedDate] = useState(null);
+
+  const [editend2, setEditEnd2]=useState('');
+  const [formattededitend2, setFormattedEditEnd2]=useState('');
+  const [editoccurrences, setEditOccurrences] = useState(0); // Define occurrences state('');
 
 
   
@@ -126,8 +134,13 @@ export default function Categorypage() {
       try {
         
         const profileIncome = await getProfile_Income(supabase, user);
+        const profileBalance = await getProfile_Balance(supabase, user);
+        const profileIncomeDate = await getProfile_id(supabase, user);
         console.log("Profile Income:",profileIncome[0].income);
         setIncome(profileIncome[0].income);
+        setBalance(profileBalance[0].balance);
+        setIncomeStart(profileIncomeDate[0].income_start_date)
+       
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -168,13 +181,15 @@ export default function Categorypage() {
         // Call the AddIncome function to update the income value in the user's profile
         const updatedProfile = await AddIncome(supabase, customer_id, inputincome);
         console.log('Profile updated with income:', updatedProfile);
-
-
+        console.log("INCOME START DATE: ",inputincomestartdate);
+        await UpdateIncomeDate(supabase,customer_id, inputincomestartdate);
 
 
         const profileIncome = await getProfile_Income(supabase, user);
+        const profileIncomedate = await getProfile_id(supabase, user);
     console.log("Profile Income:",profileIncome[0].income);
     setIncome(profileIncome[0].income);
+    setIncomeStart(profileIncomedate[0].income_start_date);
 
     // Reset the input field
     setinputIncome('');
@@ -183,9 +198,34 @@ export default function Categorypage() {
     }
 };
 
-const handleCategorySelect = (category) => {
-  setSelectedCategory(category);
-  // Add your logic to handle category selection here
+const handleBalanceChange = (e) => {
+  setinputBalance(e.target.value);
+};
+const handleSubmitBalance = async (e) => {
+  e.preventDefault();
+  try {
+      // Call the AddIncome function to update the income value in the user's profile
+      const updatedProfile = await AddBalance(supabase, customer_id, inputbalance);
+      console.log('Profile updated with Balance:', updatedProfile);
+
+
+
+
+      const profileBalance = await getProfile_Balance(supabase, user);
+  console.log("Profile Balance:",profileBalance[0].balance);
+  setBalance(profileBalance[0].balance);
+
+  // Reset the input field
+  setinputIncome('');
+  } catch (error) {
+      console.error('Error updating income:', error);
+  }
+};
+
+const handleIncomeDate = (e) => {
+  
+    setInputIncomeStartDate(e.target.value);
+
 };
 const handleAddCategory = async () => {
   try {
@@ -408,6 +448,10 @@ const handleCustomRecurrenceSubmit = () => {
   console.log('Custom Recurrence:', customRecurrence);
   console.log("Every "+repeatInterval+" "+ repeatUnit);
   console.log(endOption);
+  console.log("ENNNNNNDDDDDDDD: ",editend2)
+  
+  
+
   
 
 
@@ -415,7 +459,16 @@ const handleCustomRecurrenceSubmit = () => {
   if (editend||endOption === "Never"){
     formattedEndOption = "Never";
   }
-  else if (editend||endOption === "OnDate") {
+
+  if (editend === "OnDate") {
+    let formattedEndDate = editend2.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    formattedEndOption = formattedEndDate;
+  } else if (endOption === "OnDate") {
     let formattedEndDate = endDate.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
@@ -423,7 +476,13 @@ const handleCustomRecurrenceSubmit = () => {
       year: 'numeric'
     });
     formattedEndOption = formattedEndDate;
-  } else if (editend||endOption === "AfterOccurrences") {
+  }
+  if (editend === "AfterOccurrences") {
+    
+    formattedEndOption = "After "+ editoccurrences + " Occurrences";
+  }
+
+  else if (endOption === "AfterOccurrences") {
     formattedEndOption = "After "+ occurrences + " Occurrences";
   }
 
@@ -432,11 +491,24 @@ const handleCustomRecurrenceSubmit = () => {
   } else {
     setEndOption(formattedEndOption);
   }
-  setSelectedTime("Every "+repeatInterval+" "+ repeatUnit);
+  if (edittime !== null) {
+    setEditTime("Every "+repeatInterval+" "+ repeatUnit);
+  } else {
+    setSelectedTime("Every "+repeatInterval+" "+ repeatUnit);
+  }
+
+  
   // Close the pop-up after submission
   setShowCustomDialog(false);
 };
 
+useEffect(() => {
+  console.log("STOP :", editend);
+
+}, [editend]);
+
+
+console.log("FINAL: ", editend);
 //HANDLES FOR EDIT 
 
 
@@ -455,55 +527,120 @@ const handleEdit = (item) => {
   
 };
 
-const handleEditSubmit = async () => {
+const handleSaveEdit = async (categoryId) => {
   try {
     // Call your update function here passing the edited data
     // Example: await updateItem(editItemData);
-
+    console.log("THIS IS ID OF EDIT ITEM: ",categoryId.id);
+    console.log(editcategory);
+    console.log(editstart);
+    console.log(edittime);
+    console.log(editend);
+    console.log(editprice);
+   
+    // Call the function to delete the category from the database
+    await updateCategory(supabase,categoryId.id,editcategory,editstart,edittime,editend,editprice);
+    
     // Close the edit dialog after successful update
     setShowEditDialog(false);
 
     // Optionally, update the state to reflect the changes immediately
     // Example: setItems(updatedItems);
   } catch (error) {
-    console.error('Error updating item:', error);
+    console.error('Error updating Edited item:', error);
   }
 };
   
 
   return (    
     <div className="bg-white">
+      <div className="py-6 font-bold bg-stone-400 text-center">
+          
+     
+      </div>
     <div className="pt-6">
-      {/* SHOW CURRENT INCOME */}
-      <div className="flex justify-center mb-8">
-        <div className="bg-gray-200 p-4 rounded-md">
-          <p className="text-lg text-center font-semibold text-black">Current Income:</p>
-          <p className="text-xl text-center text-indigo-600">{income ? `$${income}` : 'Not available'}</p>
-        </div>
+      
+
+    
+    <div className="flex justify-center mb-8">
+  {/* Income Section */}
+  <div className="flex flex-col items-center mr-8"> {/* Added margin-right for spacing */}
+  <div className="bg-gray-200 p-20 rounded-md">
+    <p className="text-lg text-center font-semibold text-black">Start Date: {incomestart ? `${incomestart}` : 'Not available'}</p>
+    <p className="text-lg text-center font-semibold text-black">Current Income:</p>
+    <p className="text-xl text-center text-indigo-600">{income ? `$${income}` : 'Not available'}</p>
+  </div>
+  <form onSubmit={handleSubmitIncome} className="max-w-md w-full mt-4">
+    {/* Income Input Section */}
+    <div className="flex flex-col sm:flex-row mb-4">
+      <div className="mb-4 sm:mr-2 flex-1">
+        <label htmlFor="income" className="block text-sm font-medium text-gray-900">Income</label>
+        <input
+          type="text"
+          id="income"
+          name="income"
+          value={inputincome}
+          onChange={handleIncomeChange}
+          className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
+          placeholder="Enter your income"
+        />
       </div>
 
-
-      {/* INCOME */}
-      <div className="flex justify-center mb-8"> {/* Added margin-bottom for spacing */}
-        <form onSubmit={handleSubmitIncome} className="max-w-md w-full">
-          <div className="mb-4">
-            <label htmlFor="income" className="block text-sm font-medium text-gray-900">Income</label>
-            <input
-              type="text"
-              id="income"
-              name="income"
-              value={inputincome}
-              onChange={handleIncomeChange}
-              className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
-              placeholder="Enter your income"
-              
-            />
-          </div>
-          <div className="text-center">
-            <button type="submit" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Submit</button>
-          </div>
-        </form>
+      {/* Start Date Input Section */}
+      <div className="mb-4 sm:ml-1 flex-1 w-1">
+        <label htmlFor="start-date" className="block text-sm font-medium text-gray-900">Start Date</label>
+        <input
+          type="date" 
+          id="start-date"
+          name="start-date"
+          value={inputincomestartdate} 
+          onChange={handleIncomeDate} 
+          className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
+        />
       </div>
+    </div>
+
+    {/* Submit Button */}
+    <div className="flex items-center justify-center">
+      <button type="submit" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Submit</button>
+    </div>
+  </form>
+</div>
+
+
+
+
+  {/* Balance Section */}
+  <div className="flex flex-col items-center"> {/* Added flex-column styling */}
+    <div className="bg-gray-200 p-24 rounded-md">
+      <p className="text-lg text-center font-semibold text-black">Current Balance:</p>
+      <p className="text-xl text-center text-indigo-600">{balance ? `$${balance}` : 'Not available'}</p>
+    </div>
+    <form onSubmit={handleSubmitBalance} className="max-w-md w-full mt-4"> {/* Added margin-top for spacing */}
+      <div className="mb-4">
+        <label htmlFor="balance" className="block text-sm font-medium text-gray-900">Balance</label>
+        <input
+          type="text"
+          id="balance"
+          name="balance"
+          value={inputbalance}
+          onChange={handleBalanceChange}
+          className="mt-1 px-4 py-2 w-full rounded-md border border-gray-800 focus:border-indigo-500 focus:ring-indigo-500 text-black"
+          placeholder="Enter to change your Balance"
+        />
+      </div>
+      <div className="text-center">
+        <button type="submit" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+     
+
+      
+        
+
       
       {/* ADD Custom Category */}
 <div className="flex flex-col items-center">
@@ -717,6 +854,7 @@ const handleEditSubmit = async () => {
   value={editend !== null ? editend : endOption}
   onChange={(e) => {
     const selectedValue = e.target.value;
+    {console.log("OOOOOOOO: ",selectedValue)}
     if (editend !== null) {
       setEditEnd(selectedValue); // Set editEnd if not null
     } else {
@@ -730,24 +868,38 @@ const handleEditSubmit = async () => {
           <option value="AfterOccurrences">After a number of occurrences</option>
         </select>
         {console.log("Logging here: ",editend)}
-        {(editend||endOption) === "OnDate" && (
+        {(editend === "OnDate") ? (
           <ReactDatePicker
-          selected={endDate} // Pass the selected date
-          onChange={(date) => setEndDate(date)} // Handle date change
+          selected={editend2} // Use editend directly for selected date
+          onChange={(date) => setEditEnd2(date)} // Handle date change for editend
           className="text-black block mt-1 px-4 py-2 w-48 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
           placeholderText="Select end date" // Placeholder text
-        />
-        )}
+          />
+          ) : (endOption === "OnDate" && (
+          <ReactDatePicker
+          selected={endDate} // Use endDate for selected date
+          onChange={(date) => setEndDate(date)} // Handle date change for endDate
+          className="text-black block mt-1 px-4 py-2 w-48 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+          placeholderText="Select end date" // Placeholder text
+          />
+        ))}
         {console.log("Logging here ENDDATE: ",endDate)}
-        {(editend || endOption) === "AfterOccurrences" && (
+        
+        {(editend === "AfterOccurrences") ? (
           <input
+          type="number"
+          value={editoccurrences}
+          onChange={(e) => setEditOccurrences(e.target.value)}
+          className="text-black mt-1 px-4 py-2 w-24 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm mr-2"
+        />
+          ) : (endOption === "AfterOccurrences" && (
+            <input
             type="number"
             value={occurrences}
             onChange={(e) => setOccurrences(e.target.value)}
             className="text-black mt-1 px-4 py-2 w-24 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm mr-2"
           />
-          
-        )}
+        ))}
         {console.log("Logging here OCCC: ",occurrences)}
       </div>
 
@@ -843,7 +995,7 @@ const handleEditSubmit = async () => {
           <h2 className="text-lg font-semibold text-gray-800">Edit Item</h2>
           <div className="flex">
             <button
-              onClick={() => handleSaveEdit()}
+              onClick={() => handleSaveEdit(editItemData)}
               className="text-indigo-600 hover:text-indigo-800 font-medium mr-2 focus:outline-none"
             >
               Save
@@ -924,7 +1076,7 @@ const handleEditSubmit = async () => {
                 </option>
               ))}
               {/* Add a custom option that triggers the pop-up */}
-              <option value="Custom..." >Custom...</option>
+              <option value="Custom...">Custom...</option>
               </select>
             </li>
             <li className="py-2">
@@ -935,8 +1087,14 @@ const handleEditSubmit = async () => {
               <label className="text-black block font-medium">Price: ${editprice}</label>
               <input
               type="text"
-              value={price}
-              onChange={(e) => setnewprice(e.target.value)}
+              value={editprice}
+              onChange={(e) => {const input = e.target.value;
+                // Check if the input is a valid float number
+                if (/^\d*\.?\d*$/.test(input)) {
+                  setEditPrice(input);
+                }
+              
+              }}
               className="text-center block w-48 px-4 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
               style={{ margin: 'auto' }}
               placeholder="Enter Price"
