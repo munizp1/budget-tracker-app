@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { createClient } from "@/utils/supabase/server";
 import AuthButton from "./AuthButton";
 import SignUpButton from "./SignUpButton";
+import Admin from "./AdminLink";
 import "./twheader.css";
 
 export default function TWHeader() {
@@ -33,6 +34,8 @@ export default function TWHeader() {
           <li><a href="/contact">Contact</a></li>
           {isSupabaseConnected && <SignUpButton />}
           {isSupabaseConnected && <AuthButton />}
+
+          {isSupabaseConnected && <Admin />}
          
           </div>
             </nav>
