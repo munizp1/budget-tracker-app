@@ -380,12 +380,50 @@ console.log("DATAAAAA: ",formattedData);
 </div>
 
 
-        {/* All below is Dashboard */}
-        <header className="header" style={{ height: '400px' }}>
-            <h1 className='text-center'>Monthly Spendings</h1>
-            <Pie data={formattedData} /> {/* Render the Pie component here */}
-        </header>
-        {/* Other components and sections */}
+
+
+
+
+<header className="header" style={{ height: '600px', display: 'flex', flexDirection: 'row' }}>
+    {/* Left column */}
+    <div className="flex-1 w-32">
+        <Pie data={formattedData} /> {/* Render the Pie component here */}
+    </div>
+
+    {/* Right column */}
+<div className="flex-1  w-64 mr-10">
+    <h1 className='text-center mb-4 text-lg font-bold'>Monthly Spendings</h1>
+    <div className="overflow-auto text-center border border-gray-300 rounded-md ">
+        <table className="w-full table-fixed ">
+            <thead>
+                <tr className="bg-gray-100">
+                    <th className="px-4 py-2">Expense Type</th>
+                    <th className="px-4 py-2">Budget %</th>
+                    <th className="px-4 py-2">Monthly Budget</th>
+                    <th className="px-4 py-2">Your Expense</th>
+                    <th className="px-4 py-2">Available</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr className="border-b border-gray-300">
+                    <td className="px-4 py-2">2024-04-01</td>
+                    <td className="px-4 py-2">Food</td>
+                    <td className="px-4 py-2">$50</td>
+                </tr>
+                
+                <tr className="border-b border-gray-300">
+                    <td className="px-4 py-2">2024-04-05</td>
+                    <td className="px-4 py-2">Transportation</td>
+                    <td className="px-4 py-2">$30</td>
+                </tr>
+                {/* Add more rows as needed */}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+</header>
     </div>
 );
 }

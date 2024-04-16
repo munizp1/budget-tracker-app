@@ -34,6 +34,7 @@ export default function SignUp({
     });
 
     if (signUpError) {
+      console.log("ERROR: ",signUpError);
       return redirect("/signup?message=Could not authenticate user");
     }
     const user = data.user;
@@ -52,6 +53,8 @@ export default function SignUp({
     
   }
   console.log(profileError)
+
+
     return redirect("/signup?message=Check email to continue sign in process");
 
 
@@ -61,7 +64,7 @@ export default function SignUp({
     <div className="w-full min-h-screen flex flex-col items-center">
     <div className=" flex-1 flex flex-col w-full px-8 sm:max-w-xl justify-center gap-2 ">
       <Link
-        href="/notes"
+        href="/"
         className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
       >
         <svg

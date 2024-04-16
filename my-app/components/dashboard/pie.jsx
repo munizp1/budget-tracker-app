@@ -13,6 +13,7 @@ const Pie = ({data}) => (
     
     <ResponsivePie
         data={data}
+        
         margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
         innerRadius={0.5}
         padAngle={0.7}
@@ -67,10 +68,10 @@ const Pie = ({data}) => (
         
         legends={[
             {
-                anchor: 'top-right',
+                anchor: 'top-left',
                 direction: 'column',
                 justify: false,
-                translateX: -25,
+                translateX: -50,
                 translateY: 100,
                 itemsSpacing: 5,
                 itemWidth: 100,
