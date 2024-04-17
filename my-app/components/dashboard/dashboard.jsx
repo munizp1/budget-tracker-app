@@ -319,18 +319,79 @@ useEffect(() => {
         }
       }
 
-      
-      else if(time.includes('Every') && time.includes('days')) {
-        const interval = parseInt(time.split(' ')[1]);
+      //Does Not Repeat 
+      else if(time.includes('Does')) {
+        
         console.log("HAHAHAHHAHHA");
         let paymentDate = new Date(startDate);
-        if (endDate<=currentendDate){
-
+        if (paymentDate<=currentendDate && paymentDate>=currentDate){
+          paymentDate.setDate(paymentDate.getDate()+1);
+          newPaymentMap.set(paymentDate.toDateString(), price);
+        }
+      }
+      //Daily 
+      else if(time.includes('Daily') && endDate=='Never') {
         
+        
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 9th: ", paymentDate);
+
+        while (paymentDate <= currentendDate) {
+          paymentDate.setDate(paymentDate.getDate() + 1);
+          console.log("For Daily: ",paymentDate);
+          if (paymentDate >= currentDate && paymentDate<=currentendDate){
+            newPaymentMap.set(paymentDate.toDateString(), price);
+          }
+        }
+      }
+      //WeeklyOn
+      else if(time.includes('Weekly') && endDate=='Never') {
+        
+        const total = 7
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 6th: ", paymentDate);
+
         while (paymentDate <= currentendDate) {
           newPaymentMap.set(paymentDate.toDateString(), price);
-          paymentDate.setDate(paymentDate.getDate() + interval);
+          
+          console.log("For weeks with endDate: ",paymentDate);
+          if (paymentDate >= currentDate && paymentDate<=currentendDate){
+            paymentDate.setDate(paymentDate.getDate() + total);
+          }
         }
+      }
+      //MonthlyOn
+      else if(time.includes('Monthly') && endDate=='Never') {
+        const total = 28;
+        
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 7th: ", paymentDate);
+
+        while (paymentDate <= currentendDate) {
+          paymentDate.setDate(paymentDate.getDate() + total);
+          console.log("For months with endDate: ",paymentDate);
+          if (paymentDate >= currentDate && paymentDate<=currentendDate){
+            newPaymentMap.set(paymentDate.toDateString(), price);
+          }
+        }
+      }
+      //AnnuallyOn
+      else if(time.includes('Annually') && endDate=='Never') {
+        const total = 365;
+        
+        let paymentDate = new Date(startDate);
+        paymentDate.setDate(paymentDate.getDate() + 1);
+        console.log("START DATE for 7th: ", paymentDate);
+
+        while (paymentDate <= currentendDate && paymentDate>=currentDate) {
+          if (paymentDate<currentDate){
+            paymentDate.setDate(paymentDate.getDate() + total);
+          }
+          newPaymentMap.set(paymentDate.toDateString(), price);
+          paymentDate.setDate(paymentDate.getDate() + total); 
         }
       }
 
