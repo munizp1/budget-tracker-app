@@ -15,7 +15,7 @@ export default function Admin() {
 
     async function fetchProfiles() {
         try {
-            let { data, error } = await supabase.from('profile').select('*');
+            const { data, error } = await supabase.from('profile').select('*');
             if (error) throw error;
             setProfiles(data);
         } catch (error) {
@@ -93,7 +93,7 @@ export default function Admin() {
                     font-weight: bold;
                     text-align: center;
                 }
-                .search-box {
+                .search-box, input {
                     margin: 10px;
                     padding: 8px;
                     width: 95%;

@@ -1,7 +1,7 @@
 'use client';
 import { useState,useEffect } from 'react'
 import {UpdateIncomeDate,AddBalance,getProfile_Balance, updateCategory,deleteCustomCategory,getCustomCategory,AddCustomCategory,getProfile_Income, deleteCategory, getProfile_id, AddIncome, AddPayment, getPaymentData} from '../../lib/dbfunctions'
-import { createClient } from "@/utils/supabase/client";
+import { supabase } from "@/utils/supabase/client";
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
 
@@ -31,7 +31,7 @@ export default function Categorypage() {
   const [inputbalance, setinputBalance] = useState();
   const [income, setIncome] = useState(" ");
   const [balance, setBalance] = useState(" ");
-  const supabase = createClient();
+
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [customCategory, setcustomCategory] = useState('');
   const [showCategoryInput, setShowCategoryInput] = useState(false); // State to manage the visibility of the category input field
