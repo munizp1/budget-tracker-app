@@ -19,7 +19,7 @@ const Pie = ({data}) => (
         padAngle={0.7}
         cornerRadius={3}
         activeOuterRadiusOffset={8}
-        colors={{ scheme: 'yellow_orange_red' }}
+        colors={{ scheme: 'category10' }}
         borderWidth={1}
         borderColor={{
             from: 'color',
