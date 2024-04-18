@@ -5,14 +5,13 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense } from 'react'
 import { OrbitControls, Text } from '@react-three/drei'
 import { updateUserBalance,getProfile_id} from '../../lib/dbfunctions'
-import { createClient } from "@/utils/supabase/client";
+import { supabase } from "@/utils/supabase/client";
 
 import Dashboard from '@/components/dashboard/dashboard'
 
 export default function Homepage() {
   const [user, setUser] = useState(null);
   const [customer_id, setCustomer_id] = useState(null);
-  const supabase = createClient();
   const [modelClicked, setModelClicked] = useState(false);
   const [showBalancePopup, setShowBalancePopup] = useState(false);
   const [balanceInput, setBalanceInput] = useState('');
