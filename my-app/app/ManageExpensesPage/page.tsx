@@ -29,7 +29,7 @@ export default async function Dashboard() {
     return profileData;
   };
   const userProfile = await fetchUserProfile();
-  const isAdmin = userProfile?.IsAdmin;
+  
   return (
     <Layout>
       <Categorypage />
