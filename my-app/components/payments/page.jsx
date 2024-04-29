@@ -5,6 +5,18 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { createClient } from '@/utils/supabase/client';
 import { getPaymentData, getProfile_id } from '../../lib/dbfunctions';
 
+// Custom styles for the month picker button
+const customDatePickerStyles = {
+  backgroundColor: '#ff00ea',
+  color: 'white',
+  fontWeight: 'bold',
+  border: 'none',
+  padding: '12px 24px',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s, box-shadow 0.2s',
+};
+
 export default function PaymentPage() {
   const [customer_id, setCustomer_id] = useState(null);
   const [user, setUser] = useState(null);
@@ -68,22 +80,29 @@ export default function PaymentPage() {
     setSelectedMonth(date);
   };
 
+  // Custom button component for the month picker
+  const CustomMonthButton = ({ value, onClick }) => (
+    <button style={customDatePickerStyles} onClick={onClick}>
+      {value}
+    </button>
+  );
+
   return (
     <div>
-      <h1>Upcoming Payments</h1>
-      <div>
-        <label>Select Month: </label>
+      <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+        <label style={{ marginCenter: '1rem' }}>Select Month: </label>
         <ReactDatePicker
           selected={selectedMonth}
           onChange={handleMonthChange}
           dateFormat="MM/yyyy"
           showMonthYearPicker
+          customInput={<CustomMonthButton />}
         />
       </div>
 
       {/* Table displaying added categories */}
       <div className="mt-10">
-        <h2 className="text-lg font-semibold mb-4 ml-6 text-black">Upcoming Payments</h2>
+        <h2 className="text-xl font-semibold mb-10 ml-12 text-black">Upcoming Payments</h2>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
