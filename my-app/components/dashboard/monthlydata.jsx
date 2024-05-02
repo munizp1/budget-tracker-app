@@ -6,43 +6,40 @@ const MonthlyData = ({ user }) => {
     const supabase = createClient();
     const [customer_id, setCustomer_id] = useState(null);
     const [paymentData, setPaymentData] = useState([]);
-    const [totalPrice, setTotalPrice] = useState(0);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [currentendDate, setCurrentEndDate] = useState(new Date());
     const [paymentMaps, setPaymentMaps] = useState([]);
-    const [balance, setBalance] = useState(" ");
-    const [income, setIncome] = useState(" ");
+    const [balance, setBalance] = useState(null);
+    const [income, setIncome] = useState(null);
     const [formattedData, setFormattedData] = useState([]);
     const [totalMonthlyExpense, setTotalMonthlyExpense] = useState(0);
     const [labeledDataWithPercentage, setLabeledDataWithPercentage] = useState([]);
 
     useEffect(() => {
-        const fetchCustomerData = async () => {
-            try {
-                const profileId = await getProfile_id(supabase, user);
-                setCustomer_id(profileId);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
+      const fetchData = async () => {
+          try {
+              const profileId = await getProfile_id(supabase, user);
+              setCustomer_id(profileId);
 
-        fetchCustomerData();
-    }, [user]);
+              
 
-    useEffect(() => {
-        const fetchIncomeData = async () => {
-            try {
-                const profileBalance = await getProfile_Balance(supabase, user);
-                const profileIncome = await getProfile_Income(supabase, user);
-                setBalance(profileBalance[0].balance);
-                setIncome(profileIncome[0].income);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
+              const paymentData = await getPaymentData(supabase, profileId);
+              setPaymentData(paymentData);
+          } catch (error) {
+              console.error('Error fetching data:', error);
+          }
+      };
 
-        fetchIncomeData();
-    }, [user]);
+      fetchData();
+  }, [user]);
+
+  useEffect(() => {
+    const nextMonthDate = new Date(currentDate);
+    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+    setCurrentEndDate(nextMonthDate);
+}, [currentDate]);
+
+    
 
     useEffect(() => {
         const fetchPaymentCategories = async () => {
@@ -282,10 +279,11 @@ const MonthlyData = ({ user }) => {
           
                   while (paymentDate <= currentendDate) {
                     newPaymentMap.set(paymentDate.toDateString(), price);
+                    paymentDate.setDate(paymentDate.getDate() + total);
                     
                     console.log("For weeks with endDate: ",paymentDate);
                     if (paymentDate >= currentDate && paymentDate<=currentendDate){
-                      paymentDate.setDate(paymentDate.getDate() + total);
+                      newPaymentMap.set(paymentDate.toDateString(), price);
                     }
                   }
                 }
@@ -384,8 +382,7 @@ const MonthlyData = ({ user }) => {
     }, [paymentMaps, totalMonthlyExpense]);
 
     return {
-        balance,
-        income,
+        
         totalMonthlyExpense,
         labeledDataWithPercentage,
         formattedData,

@@ -394,3 +394,67 @@ export async function updateUserBalance (supabase, customerId,balance) {
 }
 
 
+
+
+
+
+
+export async function fetchGoals(supabase) {
+    try {
+        const { data, error } = await supabase
+            .from('Goals-Test')
+            .select('*');
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error fetching goals:', error.message);
+        throw error;
+    }
+}
+
+export const addGoal = async (supabase, goal) => {
+    try {
+        const { data, error } = await supabase
+            .from('Goals-Test')
+            .insert([goal])
+            .single();
+
+        if (error) {
+            console.error('Error adding goal:', error.message);
+            throw error;
+        }
+
+        return [data]; // Return the newly added goal as an array
+    } catch (error) {
+        console.error('Error adding goal:', error);
+        throw error;
+    }
+};
+
+export async function deleteGoal(supabase, goalId) {
+    try {
+        const { data, error } = await supabase
+            .from('Goals-Test')
+            .delete()
+            .match({ id: goalId });
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error deleting goal:', error.message);
+        throw error;
+    }
+}
+
+export const updateGoal = async (supabase, goal) => {
+    try {
+        const { data, error } = await supabase
+            .from('Goals-Test')
+            .update(goal)
+            .match({ id: goal.id });
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error updating goal:', error);
+        throw error;
+    }
+};
