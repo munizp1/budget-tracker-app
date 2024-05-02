@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import AuthButton from "./AuthButton";
 import SignUpButton from "./SignUpButton";
 import Admin from "./AdminLink";
-import logo from './Wise-Wallet.png'; // Import the image as a module
+import logou from './Wise-Wallet.png'; // Import the image as a module
 import "./twheader.css";
 
 export default function TWHeader() {
@@ -25,7 +25,7 @@ export default function TWHeader() {
                 <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
                     <div className="tw-brand">
                         {/* Use the Image component from next/image */}
-                        <Image src={logo} alt="Logo" className="logo" width={50} height={50} />
+                        <Image src={logou} alt="Logo" className="logo" width={50} height={50} />
                         <h1>Wise Wallet</h1>
                     </div>
                     <ul className="tw-nav-links">

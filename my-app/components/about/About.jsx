@@ -1,14 +1,29 @@
 'use client';
-
-// Import the wallet mascot image
-import Image from 'next/image';
-import WiseWalletImage from './Wise-Wallet.png';
-// Inside the component
+import MonthlyData from '../dashboard/monthlydata';
+import React, { useEffect, useState } from 'react';
+import { createClient } from "@/utils/supabase/client";
 export default function Aboutmepage() {
-  return (
-    <div>
-      <div className="py-6 font-bold bg-stone-400 text-center">
-        <h1 className="text-3xl font-semibold text-gray-900">About Our Budget Tracking App</h1>
+
+  const supabase = createClient();
+  const [user, setUser] = useState(null); 
+  useEffect(() => {
+    const fetchUserData = async () => {
+        try {
+            const { data } = await supabase.auth.getUser();
+            setUser(data.user.id);
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
+
+    fetchUserData();
+}, []);
+
+console.log("USER:", user);
+
+const monthlyData = MonthlyData({ user });
+console.log("MONTHLY DATA: ",monthlyData);
+
       </div>
 
       <div className="flex flex-col lg:flex-row items-center justify-center lg:col-span-32 lg:col-start-1 lg:border-r lg:border-gray-800 lg:pt-6 lg:pb-16 lg:pr-8">
