@@ -94,7 +94,7 @@ export default function Categorypage() {
   const [formattededitend2, setFormattedEditEnd2]=useState('');
   const [editoccurrences, setEditOccurrences] = useState(0); // Define occurrences state('');
 
-
+  const monthlyData = MonthlyData({ user });
   
 
   useEffect(() => {
@@ -232,7 +232,7 @@ const handleIncomeDate = (e) => {
 const handleCloseModal = () => {
   setShowModal(false);
 };
-const monthlyData = MonthlyData({ user });
+
 
 const handleAddCategory = async () => {
   try {
@@ -250,14 +250,11 @@ const handleAddCategory = async () => {
     
   // Debug: Log the newCategory object
   //console.log('New category:', newCategory);
-
-
-    
   // Refetch payment categories after adding a new one
   const updatedPaymentData = await getPaymentData(supabase, customer_id);
   setPaymentData(updatedPaymentData);
   console.log('New category added successfully.');
-
+  
   // Reset the input fields and hide the category input section
     setSelectedCategory('');
     setSelectedTime('');
@@ -1143,7 +1140,8 @@ const handleSaveEdit = async (categoryId) => {
               <div className="p-6">
                 <p className="text-gray-700">Your total monthly spending has exceeded your income.</p>
                 {/* Add any additional content for the modal */}
-                <p className="text-gray-700">Income: {income}    If new spending submitted, Spendings for this upcoming month would be: {monthlyData.totalMonthlyExpense}</p> 
+                <p className="text-gray-700">Income: ${income} </p> 
+                <p className="text-red-700">If new spending submitted, Spendings for this upcoming month would be: ${monthlyData.totalMonthlyExpense}</p> 
               </div>
             </div>
           </div>
