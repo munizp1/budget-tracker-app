@@ -4,6 +4,8 @@ import {UpdateIncomeDate,AddBalance,getProfile_Balance, updateCategory,deleteCus
 import { createClient } from "@/utils/supabase/client";
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
+import MonthlyData from '../dashboard/monthlydata';
+
 
 const categories = [
   { id: 1, name: 'Food', unavailable: false },
@@ -24,7 +26,7 @@ const times = [
 ]
 
 export default function Categorypage() {
-  
+  const [showModal, setShowModal] = useState(false);
   const [customer_id, setCustomer_id] = useState(null);
   const [user, setUser] = useState(null); 
   const [inputincome, setinputIncome] = useState();
@@ -227,6 +229,11 @@ const handleIncomeDate = (e) => {
     setInputIncomeStartDate(e.target.value);
 
 };
+const handleCloseModal = () => {
+  setShowModal(false);
+};
+const monthlyData = MonthlyData({ user });
+
 const handleAddCategory = async () => {
   try {
   // Add your logic to handle adding the new category here
@@ -236,7 +243,11 @@ const handleAddCategory = async () => {
   console.log('Selected Time:', selectedTime);
   console.log('Price:', price);
   console.log("END: ", endOption);
-  await AddPayment(supabase, customer_id, selectedCategory, selectedTime, price, startDate, endOption);
+  console.log("TOTAL SPENDING MONTHLY: ", monthlyData.totalMonthlyExpense);
+  console.log("DATAAAAA", monthlyData)
+  
+    await AddPayment(supabase, customer_id, selectedCategory, selectedTime, price, startDate, endOption);
+    
   // Debug: Log the newCategory object
   //console.log('New category:', newCategory);
 
@@ -255,10 +266,20 @@ const handleAddCategory = async () => {
     setEndOption('Never')
 
     setShowCategoryInput(false);
-  } catch (error) {
+
+  }
+  catch (error) {
     console.error('Error adding new category:', error.message);
   }
 };
+
+useEffect(() => {
+  if (monthlyData.totalMonthlyExpense > income) {
+    setShowModal(true);
+  } else {
+    setShowModal(false);
+  }
+}, [monthlyData.totalMonthlyExpense, income]);
 
 useEffect(() => {
   const fetchpaymentCategories = async () => {
@@ -553,6 +574,7 @@ const handleSaveEdit = async (categoryId) => {
   
 
   return (    
+    
     <div className="bg-white">
       <div className="py-6 font-bold bg-stone-400 text-center">
           
@@ -1107,6 +1129,27 @@ const handleSaveEdit = async (categoryId) => {
     </div>
   </div>
 )}
+{showModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <div className="relative bg-white w-96 rounded-lg">
+              <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-gray-100">
+                <h2 className="text-lg font-semibold text-gray-800">Monthly Spending Exceeded Income</h2>
+                <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-700 focus:outline-none">
+                  Close
+                </button>
+              </div>
+              <div className="p-6">
+                <p className="text-gray-700">Your total monthly spending has exceeded your income.</p>
+                {/* Add any additional content for the modal */}
+                <p className="text-gray-700">Income: {income}    If new spending submitted, Spendings for this upcoming month would be: {monthlyData.totalMonthlyExpense}</p> 
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
 
   </div>
   )}
