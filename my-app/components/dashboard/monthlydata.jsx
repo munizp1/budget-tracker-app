@@ -389,6 +389,7 @@ const MonthlyData = ({ user }) => {
         paymentData,
         currentDate,
         currentendDate,
+        paymentMaps,
     };
 };
 
