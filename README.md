@@ -1,84 +1,66 @@
-# Budget Tracker
+# Wise Wallet - Budget Tracker App
 
-## Description
-Budget Tracker is a web application designed to help people manage their finances more effectively. By providing tools to budget and save money, Budget Tracker enables users to keep a close eye on their income and expenses. This visibility into financial habits empowers users to make informed decisions, see where their money is going, and identify opportunities to save.
+## Introduction
+Wise Wallet is a comprehensive budget management tool designed to help users effectively track and manage their finances. The app provides features such as income and expense tracking, savings goals, upcoming payment alerts, and administrative controls for user management.
 
-## Technology Stack
-- **Frontend:** React.js
-- **Backend:** Node.js with Express
-- **Database:** MongoDB
+## Prerequisites
+Before you begin, ensure you have the following installed:
+- **Node.js**: [Download & Install Node.js](https://nodejs.org/en/) and the npm package manager.
 
 ## Getting Started
 
-### Prerequisites
-Before you begin, ensure you have installed:
-- Node.js
-- npm (Node Package Manager)
-- MongoDB
+### Step 1: Clone the Repository
+Start by cloning the repository to your local machine:
+```bash
+git clone https://github.com/munizp1/budget-tracker-app.git
+cd budget-tracker-app
 
-### Setup Instructions
-Follow these steps to get your development environment set up:
+Step 2: Install Dependencies
+Navigate to the project directory and install the necessary dependencies:
 
-1. **Clone the repository**
-    ```
-    git clone https://github.com/munizp1/budget-tracker-app.git
-    cd budget-tracker-app
-    ```
+npm install
 
-2. **Install Backend Dependencies**
-   - Navigate to the backend directory and install dependencies:
-        ```
-        cd server
-        npm install
-        ```
+Step 3: Create a Supabase Account
+Create an account on Supabase to manage the backend services:
 
-3. **Install Frontend Dependencies**
-   - In a new terminal window, navigate to the frontend directory and install dependencies:
-        ```
-        cd client
-        npm install
-        ```
+Sign up on Supabase
+Step 4: Setup Environment Variables
+Create an .env file in the root folder of the project. You will need to fill in the details from your Supabase project's settings:
 
-4. **Set Up Environment Variables**
-   - Create a `.env` file in the server directory based on the `.env.example` template. Fill in your MongoDB URI and any other necessary configurations. Example content for your `.env` file:
-     ```
-     MONGODB_URI=mongodb+srv://pmuniz159:la7vk0hDq20VxF0z@budgettrackerdevelopmen.8qvwdbr.mongodb.net/?retryWrites=true&w=majority&appName=BudgetTrackerDevelopment
-     PORT=3000
-     ```
+# .env file
+REACT_APP_SUPABASE_URL='YOUR_SUPABASE_URL'
+REACT_APP_SUPABASE_ANON_KEY='YOUR_SUPABASE_ANON_KEY'
 
-5. **Run the Application**
-   - Start the backend server from the server directory:
-        ```
-        npm start
-        ```
-   - In a new terminal, navigate to the client directory and start the frontend application:
-        ```
-        cd client
-        npm start
-        ```
-    The application should now be running on `localhost:3000` for the frontend. Ensure the backend server is also running as it serves the API requests from the frontend.
+Step 5: Run the Application
+With the setup complete, start the application by running:
 
-## Contribution Guidelines
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+npm run dev
 
-Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+This will start the development server on localhost:3000. Navigate to this URL in a web browser to view and interact with the application.
 
-## Project Structure
-Here is a basic overview of our project's structure:
+Features
 
-budget-tracker-app/
+HomePage/Stats: View a summary of monthly income, current balance, and spending.
+Manage Expenses: Input and track expenses on various time scales.
+Savings Goals: Set and manage savings targets.
+Upcoming Payments: Monitor and manage upcoming financial obligations.
+Admin Page: Administer user roles, access, and edit user information.
+Contact: Interface for user feedback and queries.
+Contributing
 
-├── client/ # React frontend application
+License
 
-├── server/ # Node.js + Express backend API
+Distributed under the MIT License. See LICENSE for more information.
 
-    └── models/ # MongoDB models
+Contact
+
+Project Link: https://github.com/munizp1/budget-tracker-app
+
+Acknowledgements
+
+Node.js
+Supabase
+React
 
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-- Hat tip to anyone whose code was used
-- Inspiration
-- etc
+This README provides a clear guide on how to get the application up and running, alongside links to relevant resources. You can adjust the content as necessary to better fit your project specifics or add any additional sections that may be relevant.
