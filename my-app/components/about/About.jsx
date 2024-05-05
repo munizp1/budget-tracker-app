@@ -4,7 +4,7 @@ import Image from 'next/image'; // Assuming you are using Next.js Image componen
 import WiseWalletImage from './Wise-Wallet.png'; // Correct this path if it's not accurate
 import MonthlyData from '../dashboard/monthlydata';
 import { createClient } from "@/utils/supabase/client";
-
+import "./styles.css";
 export default function Aboutmepage() {
   const supabase = createClient();
   const [user, setUser] = useState(null); 
@@ -28,36 +28,47 @@ export default function Aboutmepage() {
   console.log("MONTHLY DATA: ", monthlyData);
 
   return (
-    <div>
+    <>
       <div className="py-6 font-bold bg-stone-400 text-center">
         <h1 className="text-3xl font-semibold text-gray-900">About Our Budget Tracking App</h1>
       </div>
-      <div className="flex flex-col lg:flex-row items-center justify-center lg:col-span-32 lg:col-start-1 lg:border-r lg:border-gray-800 lg:pt-6 lg:pb-16 lg:pr-8">
-        <div className="text-center lg:w-1/2 lg:pr-8">
-          <p className="text-lg leading-relaxed text-gray-700">
-            Our budget tracking app is designed to help you take control of your finances and achieve your financial goals.
-            Whether you're saving for a vacation, planning for retirement, or just trying to stay on top of your monthly expenses,
-            our app provides the tools you need to succeed.
+      <div className="main-container">
+        <div className="text-container">
+          <p className="greeting text-lg leading-relaxed text-gray-700">
+            Dear User,
           </p>
           <p className="text-lg leading-relaxed text-gray-700">
-            With our intuitive interfaces and powerful features, you can easily track your income, expenses, and savings.
-            Set budgets for different categories, monitor your spending habits, and visualize your financial progress with
-            insightful charts and graphs.
+            We are excited to introduce you to our Budget Tracking App, meticulously designed to empower you to take control of your finances and achieve your financial goals. Whether you're planning for a dream vacation, preparing for a secure retirement, or simply managing your monthly expenses, our app is here to assist you every step of the way.
           </p>
           <p className="text-lg leading-relaxed text-gray-700">
-            Say goodbye to financial stress and hello to financial freedom with our budget tracking app.
+            Behind our app is a dedicated team of five development members, each bringing a unique blend of expertise and passion to create a user-friendly experience:
+          </p>
+          <ul className="text-lg leading-relaxed text-gray-700">
+            <li>Brianna - Lead Design and developer, helped bring the vision to life.</li>
+            <li>Chris - 3D Graphic designer and developer, helped bring functionality to the app. </li>
+            <li>Paulo - Backend Support and developer, keeps operations running smoothly and on track.</li>
+            <li>Jay - Frontend Developer, helped bring the user experience to life.</li>
+            <li>Shafqat - Quality Assurance, guarantees a bug-free and smooth operation</li>
+          </ul>
+          <p> </p>
+          <p className="text-lg leading-relaxed text-gray-700">
+            With our intuitive interfaces and powerful features, you can effortlessly track your income, expenses, and savings. Set budgets for various categories, monitor your spending habits, and visualize your financial progress through insightful charts and graphs.
           </p>
           <p className="text-lg leading-relaxed text-gray-700">
-            Join us on this journey towards better financial management.
+            Say goodbye to financial stress and hello to financial freedom. Join us on this journey towards better financial management.
           </p>
           <p className="text-lg leading-relaxed text-gray-700">
             Thank you for choosing our app to help you achieve your financial goals!
           </p>
-        </div>
-        <div className="lg:w-1/2">
+          <p className="text-lg leading-relaxed text-gray-700">
+            Warm regards,<br/>
+            <span className="italic">- Walter the Wise Wallet</span>
+          </p>
+          <div className="image-container">
           <Image src={WiseWalletImage} alt="Wise Wallet Mascot" className="w-full" />
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

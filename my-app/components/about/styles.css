@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* Body */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4; /* Light grey background */
+    color: #333; /* Dark grey text for better readability */
+}
+
+/* Container */
+.main-container {
+    max-width: 960px; /* Slightly larger width */
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff; /* White background for the content */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+/* Paragraph */
+p {
+    margin-bottom: 15px;
+    line-height: 1.6; /* Increased line spacing for readability */
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #1a202c; /* Darker shade for headings */
+    font-weight: 700; /* Bolder font for emphasis */
+}
+
+/* Text alignment */
+.text-center {
+    text-align: center;
+}
+
+/* Text styles */
+.text-lg {
+    font-size: 1.125rem; /* 18px */
+}
+
+.leading-relaxed {
+    line-height: 1.5;
+}
+
+.text-gray-700 {
+    color: #4a5568;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 24px; /* Smaller font size for headings on small screens */
+    }
+}
+
+/* Transitions for all links */
+a {
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #0056b3; /* Change color on hover */
+}
+
+.greeting {
+    margin-top: 20px; /* Adjust this value as needed to create the desired amount of space */
+}
+
+
+.image-container {
+    width: 60%; /* Increased width for the image */
+    max-width: 300px; /* Increased maximum width to allow for a larger size */
+    margin: 0 auto; /* Centering the image */
+}
