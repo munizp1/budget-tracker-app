@@ -59,7 +59,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     const nextMonthDate = new Date(currentDate);
-    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+    nextMonthDate.setMonth(nextMonthDate.getMonth() + 11);
     setCurrentEndDate(nextMonthDate);
   }, [currentDate]);
 
@@ -78,7 +78,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     const nextMonthDate = new Date(currentDate);
-    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+    nextMonthDate.setMonth(nextMonthDate.getMonth() + 11);
     setCurrentEndDate(nextMonthDate);
   }, [currentDate]);
 
