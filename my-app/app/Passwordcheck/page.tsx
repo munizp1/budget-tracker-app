@@ -1,11 +1,11 @@
 import Layout from "../../components/layout"
-import Aboutmepage from '../../components/about/About.jsx'
+import App from '../../components/passwordcheck/passwordtest'
 
 export default function About() {
   
   return (
     <Layout>
-       <Aboutmepage/>
+       <App/>
     </Layout>
   )
 }

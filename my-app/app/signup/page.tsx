@@ -145,6 +145,13 @@ export default function SignUp({
     </p>
   )}
 </form>
+<div>
+          <Link href="/passwordcheck" passHref>
+            <p className="text-md text-foreground hover:text-primary transition-colors">
+              Password Check
+            </p>
+          </Link>
+</div>
 </div>
 </div>   
     
