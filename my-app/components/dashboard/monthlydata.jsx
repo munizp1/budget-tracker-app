@@ -58,7 +58,7 @@ const MonthlyData = ({ user }) => {
 
     useEffect(() => {
         const nextMonthDate = new Date(currentDate);
-        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 12);
         setCurrentEndDate(nextMonthDate);
     }, [currentDate]);
 

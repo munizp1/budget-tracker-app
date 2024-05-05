@@ -58,11 +58,14 @@ export default function PaymentPage() {
   }, [user]);
 
   useEffect(() => {
-    const nextMonthDate = new Date(currentDate);
-    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
-    setCurrentEndDate(nextMonthDate);
-  }, [currentDate]);
-
+    const currentYear = currentDate.getFullYear();
+    const startDate = new Date(currentYear, 0, 1); // January 1st of the current year
+    const endDate = new Date(currentYear, 11, 31); // December 31st of the current year
+  
+    setCurrentDate(startDate);
+    setCurrentEndDate(endDate);
+  }, []);
+  
   useEffect(() => {
     const fetchPaymentCategories = async () => {
       try {
@@ -72,13 +75,13 @@ export default function PaymentPage() {
         console.error('Error fetching payment data:', error);
       }
     };
-
+  
     fetchPaymentCategories();
-  }, [customer_id]);
-
+  }, [customer_id, currentDate, currentendDate]);
+  
   useEffect(() => {
     const nextMonthDate = new Date(currentDate);
-    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+    nextMonthDate.setMonth(nextMonthDate.getMonth() + 12);
     setCurrentEndDate(nextMonthDate);
   }, [currentDate]);
 
@@ -93,12 +96,11 @@ export default function PaymentPage() {
         console.log("Start Date: ", startDate)
 
         //const endDate = new Date(end_at);
-        const endDate = end_at === 'Never' ? 'Never' : new Date(end_at);
-        console.log("End Date: ", endDate);
-        console.log("TIME: ", time);
-
+        const endDate = end_at === '' ? 'Never' : (end_at === 'Never' ? 'Never' : new Date(end_at));
+        console.log("End Date (Raw):", end_at);
+        console.log("End Date (Parsed):", endDate);
         
-
+        
         if(time.includes('Every') && time.includes('days') && endDate == 'Never') {
             const interval = parseInt(time.split(' ')[1]);
             
@@ -112,8 +114,7 @@ export default function PaymentPage() {
               if (paymentDate >= currentDate){
                 newPaymentMap.set(paymentDate.toDateString(), price);
               }
-              
-              
+
             }
     
           }
@@ -261,7 +262,23 @@ export default function PaymentPage() {
               }
             }
           }
-    
+          console.log("Time:", time);
+          console.log("End Date:", endDate);
+          
+          if (time.includes('Every') && time.includes('months') && endDate == 'Never') {
+            console.log("Monthly payment generation:");
+            const interval = parseInt(time.split(' ')[1]);
+            let paymentDate = new Date(startDate);
+            paymentDate.setDate(paymentDate.getDate() + 1); // Move to the next day to avoid double counting on the start date
+          
+            console.log("Start Date:", paymentDate.toDateString());
+          
+            while (paymentDate <= currentendDate) {
+              console.log("Generating payment for:", paymentDate.toDateString());
+              newPaymentMap.set(paymentDate.toDateString(), price);
+              paymentDate.setMonth(paymentDate.getMonth() + interval); // Move to the next month
+            }
+          }
           //Does Not Repeat 
           else if(time.includes('Does')) {
             
@@ -367,7 +384,17 @@ export default function PaymentPage() {
           }
           }
     
-    
+    // Check if end_at specifies a limited number of occurrences
+    if (end_at.includes('After')) {
+      const numOccurrences = parseInt(end_at.split(' ')[1]);
+      const interval = parseInt(time.split(' ')[1]); // Define interval here based on the payment's time
+      let paymentDate = new Date(startDate);
+      paymentDate.setDate(paymentDate.getDate() + 1); // Move to the next day to avoid double counting on the start date
+      for (let i = 0; i < numOccurrences; i++) {
+          newPaymentMap.set(paymentDate.toDateString(), price);
+          paymentDate.setMonth(paymentDate.getMonth() + interval); // Move to the next month based on the defined interval
+      }
+  }  
         console.log(`Generated map :`, newPaymentMap);
         newPaymentMaps.push({ category, paymentMap: newPaymentMap });
       });
@@ -408,7 +435,7 @@ export default function PaymentPage() {
       paymentDate.getFullYear() === selectedMonth.getFullYear()
     );
   });
-
+  
   // Sort filtered payments by date in ascending order
   const sortedFilteredPayments = filteredPayments.sort((a, b) => new Date(a.started_at) - new Date(b.started_at));
 
